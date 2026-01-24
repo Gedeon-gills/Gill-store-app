@@ -3,9 +3,13 @@ import Categories from "../ui/Categories";
 import HomeProducts from "../layouts/Productshomepage";
 import Divisions from "../layouts/divisions";
 import DivStarter from "../ui/DivStarter";
-export default function Body() {
+import Header from "../forms/Headers";
+import Footer from "../forms/Footer";
+import { Outlet } from "react-router-dom";
+export default function Home() {
   return (
     <div>
+      <Header />
       <FirstDivision />
       <Categories />
       <DivStarter description="FEATURED PRODUCTS" />
@@ -14,8 +18,10 @@ export default function Body() {
       <Divisions />
       <DivStarter description="WOMEN'S FASHION" />
       <Divisions />
-      <DivStarter description="POPULAR"/>
-      <Divisions/>
+      <DivStarter description="POPULAR" />
+      <Divisions />
+      <Footer />
+      <Outlet />
     </div>
   );
 }

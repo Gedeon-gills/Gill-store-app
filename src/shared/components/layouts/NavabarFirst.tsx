@@ -1,6 +1,6 @@
 import { FaBlog, FaPhone, FaBook } from "react-icons/fa";
 import React from "react";
-
+import { Link } from "react-router-dom";
 export default function FirstNavBar() {
   const [LangOpen, setLangOpen] = React.useState(false);
   const [CurrOpen, setCurrOpen] = React.useState(false);
@@ -58,13 +58,13 @@ export default function FirstNavBar() {
       {/* Right */}
       <ul className="flex gap-4">
         <li className="flex items-center gap-1.5 cursor-pointer hover:text-gray-200">
-          <FaBlog className="text-[10px]" /> BLOG
+          <FaBlog className="text-[10px]" /> <Link to={"/BLog"}>BLOG</Link>
         </li>
         <li className="flex items-center gap-1.5 cursor-pointer hover:text-gray-200">
-          <FaBook className="text-[10px]" /> FAQ
+          <FaBook className="text-[10px]" /> <Link to={"/FAQ"}>FAQ</Link>
         </li>
         <li className="flex items-center gap-1.5 cursor-pointer hover:text-gray-200">
-          <FaPhone className="text-[10px]" /> CONTACTS
+          <FaPhone className="text-[10px]" /> <Link to={"/ContactUs"}>CONTACT US</Link>
         </li>
       </ul>
     </nav>

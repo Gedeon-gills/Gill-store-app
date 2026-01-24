@@ -1,5 +1,5 @@
 import { FaBars } from "react-icons/fa";
-
+import { Link } from "react-router-dom";
 export default function ThirdNavBar() {
   return (
     <nav className="bg-white border-t border-b border-gray-200">
@@ -11,13 +11,21 @@ export default function ThirdNavBar() {
         </li>
 
         {/* NAV LINKS */}
-        <li className="cursor-pointer hover:text-blue-600">HOME</li>
-        <li className="cursor-pointer hover:text-blue-600">SHOP</li>
+        <li className="cursor-pointer hover:text-blue-600">
+          <Link to={"/"}>HOME</Link>
+        </li>
+        <li className="cursor-pointer hover:text-blue-600">
+          <Link to={"/Shop"}>SHOP</Link>
+        </li>
         <li className="cursor-pointer hover:text-blue-600">PAGES</li>
-        <li className="cursor-pointer hover:text-blue-600">BLOGS</li>
-        <li className="cursor-pointer hover:text-blue-600">ELEMENTS</li>
+        <li className="cursor-pointer hover:text-blue-600">
+          <Link to={"/Blogs"}>BLOGS</Link>
+        </li>
+        <li className="cursor-pointer hover:text-blue-600">
+          <Link to={"/Elements"}>ELEMENTS</Link>
+        </li>
         <li className="cursor-pointer bg-blue-600  text-white m-6 p-3 rounded-2xl font-bold">
-          BUY NOW
+          <Link to={"/BuyNow"}>BUY NOW</Link>
         </li>
       </ul>
     </nav>

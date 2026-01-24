@@ -1,5 +1,5 @@
 import { FaSearch, FaShoppingBag, FaUser, FaHeart } from "react-icons/fa";
-
+import { Link } from "react-router-dom";
 export default function SecondNavBar() {
   return (
     <nav className="bg-blue-600 py-4">
@@ -22,19 +22,19 @@ export default function SecondNavBar() {
         {/* SIGN IN */}
         <li className="flex items-center gap-1 text-white text-sm font-medium cursor-pointer hover:opacity-80">
           <FaUser className="text-sm" />
-          SIGN IN
+          <Link to={"/RegisterLogin"}>SIGN IN</Link>
         </li>
 
         {/* FAVS */}
         <li className="flex items-center gap-1 text-white text-sm font-medium cursor-pointer hover:opacity-80">
           <FaHeart className="text-sm" />
-          FAVS
+          <Link to={"/Favourites"}>FAVS</Link>
         </li>
 
         {/* CARTS */}
         <li className="flex items-center gap-1 text-white text-sm font-medium cursor-pointer hover:opacity-80">
           <FaShoppingBag className="text-sm" />
-          CARTS
+          <Link to={"/Carts"}>CARTS</Link>
         </li>
       </ul>
     </nav>
