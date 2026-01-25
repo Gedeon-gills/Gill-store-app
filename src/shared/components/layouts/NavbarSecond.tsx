@@ -2,8 +2,8 @@ import { FaSearch, FaShoppingBag, FaUser, FaHeart } from "react-icons/fa";
 import { Link } from "react-router-dom";
 export default function SecondNavBar() {
   return (
-    <nav className="bg-blue-600 py-4">
-      <ul className="max-w-7xl mx-auto px-4 flex items-center justify-between gap-6">
+    <nav className="bg-blue-600 py-4 h-30  justify-baseline">
+      <ul className="max-w-7xl mx-auto px-4 flex items-center justify-between gap-6 mt-10">
         {/* LOGO */}
         <li className="text-white text-2xl font-bold tracking-wide">
           B-DIFFERENT

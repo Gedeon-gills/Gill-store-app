@@ -1,7 +1,6 @@
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import Home from "./shared/components/pages/Home";
 import Blogs from "./shared/components/pages/blogs";
-import BuyNow from "./shared/components/pages/buyNow";
 import Carts from "./shared/components/pages/carts";
 import Elements from "./shared/components/pages/elements";
 import ContactUs from "./shared/components/pages/contactUs";
@@ -18,7 +17,6 @@ export default function App() {
         <Route path="/Register" element={<RegisterLogin />} />
         <Route path="/" element={<Home />} />
         <Route path="/blogs" element={<Blogs />} />
-        <Route path="/BuyNow" element={<BuyNow />} />
         <Route path="/Carts" element={<Carts />} />
         <Route path="/Elements" element={<Elements />} />
         <Route path="/ContactUs" element={<ContactUs />} />

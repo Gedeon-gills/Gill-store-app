@@ -25,7 +25,12 @@ export default function ThirdNavBar() {
           <Link to={"/Elements"}>ELEMENTS</Link>
         </li>
         <li className="cursor-pointer bg-blue-600  text-white m-6 p-3 rounded-2xl font-bold">
-          <Link to={"/BuyNow"}>BUY NOW</Link>
+          <a
+            href="https://themeforest.net//cart/configure_before_adding/24187521?license=regular&support=bundle_6month&irgwc=1&afsrc=1&clickid=S4czo%3ASHGxycTqtVCZ10BWe8UkpScXRFvxGJR00&iradid=275988&irpid=2024187&iradtype=ONLINE_TRACKING_LINK&irmptype=mediapartner&mp_value1=&utm_campaign=af_impact_radius_2024187&utm_medium=affiliate&utm_source=impact_radius"
+            target="blank"
+          >
+            BUY NOW
+          </a>
         </li>
       </ul>
     </nav>

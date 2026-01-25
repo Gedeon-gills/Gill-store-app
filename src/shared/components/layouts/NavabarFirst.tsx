@@ -58,7 +58,7 @@ export default function FirstNavBar() {
       {/* Right */}
       <ul className="flex gap-4">
         <li className="flex items-center gap-1.5 cursor-pointer hover:text-gray-200">
-          <FaBlog className="text-[10px]" /> <Link to={"/BLog"}>BLOG</Link>
+          <FaBlog className="text-[10px]" /> <Link to={"/BLogs"}>BLOG</Link>
         </li>
         <li className="flex items-center gap-1.5 cursor-pointer hover:text-gray-200">
           <FaBook className="text-[10px]" /> <Link to={"/FAQ"}>FAQ</Link>
