@@ -2,7 +2,7 @@ import ProductHomeCard from "../ui/ProductCard";
 import { products } from "../../store/products";
 
 interface ProductsProps {
-  limit: number;
+  limit?: number;
   category?: string; // 👈 optional
 }
 
