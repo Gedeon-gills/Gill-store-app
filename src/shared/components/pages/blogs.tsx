@@ -3,6 +3,8 @@ import { FaSearchengin } from "react-icons/fa6";
 import BlogsProductCard from "../layouts/BlogProduct";
 import Header from "../forms/Headers";
 import Footer from "../forms/Footer";
+import { products } from "../../store/products";
+
 export default function Blogs() {
   const [showRecent, setShowRecent] = useState(true);
   const [showArchives, setShowArchives] = useState(true);
@@ -12,8 +14,9 @@ export default function Blogs() {
   return (
     <div>
       <Header />
+
+      {/* Page Header */}
       <section className="bg-gray-50">
-        {/* Header */}
         <div className="text-center py-16 bg-white">
           <h1 className="text-3xl font-semibold text-gray-900">
             Checkout Our Blogs
@@ -23,45 +26,22 @@ export default function Blogs() {
 
         {/* Main layout */}
         <div className="max-w-7xl mx-auto px-6 py-14 grid grid-cols-1 lg:grid-cols-4 gap-12">
-          {/* Sidebar */}
           {/* Blog Cards */}
           <main className="lg:col-span-3 grid grid-cols-1 md:grid-cols-2 gap-10">
-            <BlogsProductCard
-              image="https://i.pinimg.com/1200x/04/4c/ca/044cca18d3dd80893d340835f62e7dfa.jpg"
-              category="Technology"
-              title="Top 10 Accessories for Your Smart Device"
-              owner="Admin"
-              date="Aug 24, 2024"
-              intro="Discover the must-have accessories that can improve productivity and protect your smart devices every day."
-            />
-
-            <BlogsProductCard
-              image="https://i.pinimg.com/1200x/04/4c/ca/044cca18d3dd80893d340835f62e7dfa.jpg"
-              category="Lifestyle"
-              title="How Technology is Changing Our Daily Lives"
-              owner="John Doe"
-              date="Sep 02, 2024"
-              intro="Technology continues to reshape how we work, communicate, and live."
-            />
-
-            <BlogsProductCard
-              image="https://i.pinimg.com/1200x/04/4c/ca/044cca18d3dd80893d340835f62e7dfa.jpg"
-              category="Technology"
-              title="Top 10 Accessories for Your Smart Device"
-              owner="Admin"
-              date="Aug 24, 2024"
-              intro="Discover the must-have accessories that can improve productivity."
-            />
-
-            <BlogsProductCard
-              image="https://i.pinimg.com/1200x/04/4c/ca/044cca18d3dd80893d340835f62e7dfa.jpg"
-              category="Lifestyle"
-              title="How Technology is Changing Our Daily Lives"
-              owner="John Doe"
-              date="Sep 02, 2024"
-              intro="Technology continues to reshape how we work and live."
-            />
+            {products.slice(0, 8).map((product, i) => (
+              <BlogsProductCard
+                key={i}
+                image={product.images[0]}
+                category={product.category || "Technology"}
+                title={product.name}
+                owner={product.owner || "Admin"}
+                date={product.date || "Aug 24, 2024"}
+                intro={product.description || "Check out this product!"}
+              />
+            ))}
           </main>
+
+          {/* Sidebar */}
           <aside className="lg:col-span-1 space-y-12">
             {/* Search */}
             <div>
@@ -88,18 +68,18 @@ export default function Blogs() {
 
               {showRecent && (
                 <ul className="mt-5 space-y-5">
-                  {[...Array(5)].map((_, i) => (
+                  {products.slice(0, 5).map((product, i) => (
                     <li key={i} className="flex gap-4">
                       <img
-                        src="https://i.pinimg.com/1200x/04/4c/ca/044cca18d3dd80893d340835f62e7dfa.jpg"
+                        src={product.images[0]}
                         className="w-20 h-20 object-cover"
                       />
                       <div>
                         <p className="text-sm font-medium leading-snug hover:text-blue-600 cursor-pointer">
-                          How Technology is Changing Our Daily Lives
+                          {product.name}
                         </p>
                         <p className="text-xs text-gray-500 mt-1">
-                          Aug 24, 2024
+                          {product.date || "Aug 24, 2024"}
                         </p>
                       </div>
                     </li>
