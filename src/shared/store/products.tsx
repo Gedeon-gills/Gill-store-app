@@ -1,5 +1,7 @@
 // src/store/products.ts
 export interface Product {
+  date?: string;
+  owner?: string;
   priceDown?: any;
   id: number;
   name: string;
