@@ -47,23 +47,25 @@ export default function StickyNavBar() {
         {/* Menu */}
         <ul className="nav-sticky-menu flex gap-6">
           <li>
-            <Link to={"/Home"}></Link>HOME
+            <Link to="/Home">HOME</Link>
           </li>
           <li>
-            <Link to={"/Shop"}></Link>SHOP
+            <Link to="/Shop">SHOP</Link>
           </li>
           <li>
-            <Link to={"/Pages"}></Link>PAGES
+            <Link to="/Pages">PAGES</Link>
           </li>
           <li>
-            <Link to={"/Blogs"}></Link>BLOG
+            <Link to="/Blogs">BLOG</Link>
           </li>
           <li>
-            <Link to={"/Elements"}></Link>ELEMENTS
+            <Link to="/Elements">ELEMENTS</Link>
           </li>
+
           <li>
-            <a href="https://themeforest.net//cart/configure_before_adding/24187521?license=regular&support=bundle_6month&irgwc=1&afsrc=1&clickid=S4czo%3ASHGxycTqtVCZ10BWe8UkpScLU5vxGJR00&iradid=275988&irpid=2024187&iradtype=ONLINE_TRACKING_LINK&irmptype=mediapartner&mp_value1=&utm_campaign=af_impact_radius_2024187&utm_medium=affiliate&utm_source=impact_radius"
-            target="blank"
+            <a
+              href="https://themeforest.net//cart/configure_before_adding/24187521?license=regular&support=bundle_6month&irgwc=1&afsrc=1&clickid=S4czo%3ASHGxycTqtVCZ10BWe8UkpScLU5vxGJR00&iradid=275988&irpid=2024187&iradtype=ONLINE_TRACKING_LINK&irmptype=mediapartner&mp_value1=&utm_campaign=af_impact_radius_2024187&utm_medium=affiliate&utm_source=impact_radius"
+              target="blank"
             >
               BUY NOW
             </a>
