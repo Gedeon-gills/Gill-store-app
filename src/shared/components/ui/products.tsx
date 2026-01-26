@@ -1,9 +1,23 @@
 import ProductHomeCard from "../ui/ProductCard";
 import { products } from "../../store/products";
-export default function Products() {
+
+interface ProductsProps {
+  limit: number;
+  category?: string; // 👈 optional
+}
+
+export default function Products({ limit, category }: ProductsProps) {
+  const displayedProducts = products
+    .filter((product) => {
+      if (!category) return true;
+
+      return product.category?.toLowerCase() === category.toLowerCase();
+    })
+    .slice(0, limit);
+
   return (
-    <div className="flex flex-wrap px-10 mt-7 gap-7">
-      {products.map((product) => (
+    <div className="flex flex-wrap px-10 mt-7 ml-12 gap-7">
+      {displayedProducts.map((product) => (
         <ProductHomeCard
           key={product.id}
           id={product.id}

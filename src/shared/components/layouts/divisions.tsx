@@ -1,35 +1,27 @@
-import HeroSlider from "./firstPageDiv";
-import HomeProducts from "./Productshomepage";
+interface DivisionsProps {
+  title: string;
+  items: string[]
+}
 
-export default function HomeSection() {
+export default function Divisions({ title, items }: DivisionsProps) {
   return (
-    <div className="max-w-7xl mx-auto px-3 mt-10 space-y-10">
-      {/* TOP SECTION */}
-      <div className="grid grid-cols-12 gap-6">
-        {/* LEFT: Categories */}
-        <aside className="col-span-3 border border-gray-200 p-4">
-          <h3 className="font-semibold mb-4 text-blue-600">Men's Fashion</h3>
-          <ul className="space-y-3 text-sm">
-            <li className="hover:text-blue-600 cursor-pointer">Wallets</li>
-            <li className="hover:text-blue-600 cursor-pointer">T-Shirts</li>
-            <li className="hover:text-blue-600 cursor-pointer">Shirts</li>
-            <li className="hover:text-blue-600 cursor-pointer">Jeans</li>
-            <li className="hover:text-blue-600 cursor-pointer">
-              Jackets & Coats
-            </li>
-          </ul>
-        </aside>
-
-        {/* RIGHT: Hero Slider */}
-        <div className="col-span-6">
-          <HeroSlider />
-        </div>
+    <aside className="border border-gray-200 ml-50 mt-30 bg-white">
+      {/* Title */}
+      <div className="px-5 py-4 border-b border-gray-200">
+        <h3 className="text-[16px] font-semibold text-blue-600">{title}</h3>
       </div>
 
-      {/* BOTTOM SECTION: PRODUCTS */}
-      <div>
-        <HomeProducts />
-      </div>
-    </div>
+      {/* Category list */}
+      <ul className="px-5 py-4 space-y-4 text-[14px] text-gray-700">
+        {items.map((item, index) => (
+          <li
+            key={index}
+            className="cursor-pointer transition-colors duration-200 hover:text-blue-600"
+          >
+            {item}
+          </li>
+        ))}
+      </ul>
+    </aside>
   );
 }
