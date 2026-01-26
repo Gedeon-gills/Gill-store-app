@@ -13,7 +13,7 @@ export default function Home() {
       <FirstDivision />
       <Categories />
       <DivStarter description="FEATURED PRODUCTS" />
-      <Products limit={5} />
+      <Products limit={4} />
       <DivStarter description="MEN'S FASHION" />
       <div className="grid grid-cols-12 gap-6">
         {/* LEFT SIDEBAR */}

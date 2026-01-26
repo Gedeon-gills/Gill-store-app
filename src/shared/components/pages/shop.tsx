@@ -15,7 +15,7 @@ export default function Shop() {
 
       <div className="flex">
         <ShopSidebar />
-        <Products limit={0} />
+        <Products />
       </div>
 
       <Footer />
