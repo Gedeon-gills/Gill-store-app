@@ -4,10 +4,9 @@ export default function ThirdNavBar() {
   return (
     <nav className="bg-white border-t border-b border-gray-200">
       <ul className="max-w-7xl mx-auto px-4 flex items-center gap-8 h-14 text-sm font-semibold text-gray-800">
-        {/* SHOP BY DEPARTMENT */}
-        <li className="flex items-center gap-2 text-white px-4 h-full cursor-pointer">
-          <FaBars className="text-sm" />
+        <li className="flex items-center gap-2 px-4 h-full cursor-pointer">
           SHOP BY DEPARTMENT
+          <FaBars className="text-sm" />
         </li>
 
         {/* NAV LINKS */}

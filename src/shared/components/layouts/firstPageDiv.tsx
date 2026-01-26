@@ -12,13 +12,23 @@ export default function HeroSlider() {
   }, []);
 
   return (
-    <div className="relative ml-50 h-[70vh] w-200 overflow-hidden">
-      <img
-        src={slides[index].image}
-        alt=""
-        className="absolute inset-0 w-full h-full object-cover transition-opacity duration-700"
-      />
-
+    <div className="relative h-[70vh] w-[50vw] mx-40 overflow-hidden">
+      {slides[index].type === "video" ? (
+        <video
+          src={slides[index].src}
+          autoPlay
+          muted
+          loop
+          playsInline
+          className="absolute inset-0 w-full h-full object-cover"
+        />
+      ) : (
+        <img
+          src={slides[index].src}
+          alt={slides[index].title}
+          className="absolute inset-0 w-full h-full object-cover"
+        />
+      )}
       <div className="absolute inset-0 bg-black/40 flex items-center">
         <div className="max-w-7xl mx-auto px-4 text-white">
           <h1 className="text-4xl font-bold animate-slideUp">

@@ -14,10 +14,15 @@ export default function ContactUs() {
       </div>
 
       {/* ===== Map Section ===== */}
-      <div className="w-full h-[450px] bg-gray-200 flex items-center justify-center text-gray-600 text-lg">
-        Map will be here
+      <div className="w-full h-[450px] bg-gray-200">
+        <iframe
+          title="Office Location"
+          src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3987.511993875192!2d30.0881484!3d-1.9394677!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x19dca6eb4b136305%3A0xfa7ecaf4c40f3383!2skLab!5e0!3m2!1sen!2srw!4v1700000000000"
+          className="w-full h-full border-0"
+          referrerPolicy="no-referrer-when-downgrade"
+        ></iframe>
       </div>
-
+ 
       {/* ===== Content ===== */}
       <div className="max-w-7xl mx-auto px-6 py-20 grid grid-cols-1 lg:grid-cols-2 gap-16">
         {/* ===== Contact Form ===== */}
@@ -118,7 +123,7 @@ export default function ContactUs() {
 
             <p className="flex items-center gap-3 text-gray-600 mb-2">
               <FaClock />
-              Monday – Friday: 9am to 7pm
+              Monday - Friday: 9am to 7pm
             </p>
 
             <p className="flex items-center gap-3 text-gray-600 mb-2">

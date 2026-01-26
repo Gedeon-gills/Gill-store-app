@@ -1,6 +1,16 @@
 import { FaSearch, FaShoppingBag, FaUser, FaHeart } from "react-icons/fa";
 import { Link } from "react-router-dom";
+import CartDrawer from "../ui/cartsPopup";
+import { useState } from "react";
+import LoginModal from "../ui/registration";
 export default function SecondNavBar() {
+  const [isCartOpen, setIsCartOpen] = useState(false);
+  const [isLoginOpen, setIsLoginOpen] = useState(false);
+
+  const openLogin = () => setIsLoginOpen(true);
+  const closeLogin = () => setIsLoginOpen(false);
+  const openCart = () => setIsCartOpen(true);
+  const closeCart = () => setIsCartOpen(false);
   return (
     <nav className="bg-blue-600 py-4 h-30  justify-baseline">
       <ul className="max-w-7xl mx-auto px-4 flex items-center justify-between gap-6 mt-10">
@@ -20,9 +30,11 @@ export default function SecondNavBar() {
         </li>
 
         {/* SIGN IN */}
-        <li className="flex items-center gap-1 text-white text-sm font-medium cursor-pointer hover:opacity-80">
-          <FaUser className="text-sm" />
-          <Link to={"/RegisterLogin"}>SIGN IN</Link>
+        <li
+          onClick={openLogin}
+          className="flex items-center gap-1 text-white text-sm font-medium cursor-pointer hover:opacity-80"
+        >
+          <FaUser className="text-sm" />SIGN-IN
         </li>
 
         {/* FAVS */}
@@ -32,11 +44,16 @@ export default function SecondNavBar() {
         </li>
 
         {/* CARTS */}
-        <li className="flex items-center gap-1 text-white text-sm font-medium cursor-pointer hover:opacity-80">
-          <FaShoppingBag className="text-sm" />
-          <Link to={"/Carts"}>CARTS</Link>
+        <li
+          onClick={openCart}
+          className="flex items-center gap-1 text-white text-sm font-medium cursor-pointer hover:opacity-80"
+        >
+          <FaShoppingBag className="text-sm" />CARTS
+          {/*<Link to={"/Carts"}>CARTS</Link>*/}
         </li>
       </ul>
+      <CartDrawer isOpen={isCartOpen} onClose={closeCart} />
+      <LoginModal isOpen={isLoginOpen} onClose={closeLogin} />
     </nav>
   );
 }

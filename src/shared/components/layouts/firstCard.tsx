@@ -4,7 +4,7 @@ export default function FirstCard() {
   return (
     <div className="relative w-120 h-70 p-3 overflow-hidden group cursor-pointer">
       <img
-        src={slides[1].image}
+        src={slides[0].src}
         alt="For men"
         className="w-full h-full object-cover transition-transform duration-500 transform group-hover:scale-110"
       />
