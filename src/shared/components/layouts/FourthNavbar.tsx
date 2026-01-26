@@ -47,7 +47,7 @@ export default function StickyNavBar() {
         {/* Menu */}
         <ul className="nav-sticky-menu flex gap-6">
           <li>
-            <Link to="/Home">HOME</Link>
+            <Link to="/">HOME</Link>
           </li>
           <li>
             <Link to="/Shop">SHOP</Link>
