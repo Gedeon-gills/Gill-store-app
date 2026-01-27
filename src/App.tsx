@@ -8,7 +8,7 @@ import FAQ from "./shared/components/pages/F&Q";
 import Favourites from "./shared/components/pages/favourites";
 import Shop from "./shared/components/pages/shop";
 import RegisterLogin from "./shared/components/pages/RegisterLogin";
-import HomeProducts from "./shared/components/layouts/Productshomepage";
+import ProductPage from "./shared/components/pages/prodWeb";
 import CategoriesWeb from "./shared/components/pages/categoryWeb";
 
 export default function App() {
@@ -19,7 +19,7 @@ export default function App() {
         <Route path="/Register" element={<RegisterLogin />} />
         <Route path="/" element={<Home />} />
         <Route path="/blogs" element={<Blogs />} />
-        <Route path="/product/:id" element={<HomeProducts />} />
+        <Route path="/product/:id" element={<ProductPage/>} />
         <Route path="/Carts" element={<Carts />} />
         <Route path="/Elements" element={<Elements />} />
         <Route path="/category/:name" element={<CategoriesWeb />} />

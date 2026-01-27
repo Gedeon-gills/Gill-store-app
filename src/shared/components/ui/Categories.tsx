@@ -6,7 +6,7 @@ export default function Categories() {
   const navigate = useNavigate();
 
   return (
-    <div className="flex px-40 gap-8">
+    <div className="flex  py-16 gap-8">
       {CatgoriesArr.map((category) => (
         <div
           key={category.name}

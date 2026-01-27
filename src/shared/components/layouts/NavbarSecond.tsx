@@ -2,12 +2,16 @@ import { FaSearch, FaShoppingBag, FaUser, FaHeart } from "react-icons/fa";
 import { Link } from "react-router-dom";
 import CartDrawer from "../ui/cartsPopup";
 import { useState } from "react";
-import LoginModal from "../ui/registration";
+import LoginModal from "../ui/login";
+import RegisterModal from "../ui/register";
 export default function SecondNavBar() {
   const [isCartOpen, setIsCartOpen] = useState(false);
   const [isLoginOpen, setIsLoginOpen] = useState(false);
-
+  const [isRegisterOpen, setIsRegisterOpen] = useState(false);
+  const [isAccount, setIsAccount] = useState(false);
   const openLogin = () => setIsLoginOpen(true);
+  const openRegister = () => setIsRegisterOpen(true);
+  const closeRegister = () => setIsRegisterOpen(false);
   const closeLogin = () => setIsLoginOpen(false);
   const openCart = () => setIsCartOpen(true);
   const closeCart = () => setIsCartOpen(false);
@@ -28,15 +32,6 @@ export default function SecondNavBar() {
           />
           <FaSearch className="text-gray-500 text-sm cursor-pointer" />
         </li>
-
-        {/* SIGN IN */}
-        <li
-          onClick={openLogin}
-          className="flex items-center gap-1 text-white text-sm font-medium cursor-pointer hover:opacity-80"
-        >
-          <FaUser className="text-sm" />SIGN-IN
-        </li>
-
         {/* FAVS */}
         <li className="flex items-center gap-1 text-white text-sm font-medium cursor-pointer hover:opacity-80">
           <FaHeart className="text-sm" />
@@ -48,12 +43,45 @@ export default function SecondNavBar() {
           onClick={openCart}
           className="flex items-center gap-1 text-white text-sm font-medium cursor-pointer hover:opacity-80"
         >
-          <FaShoppingBag className="text-sm" />CARTS
+          <FaShoppingBag className="text-sm" />
+          CARTS
           {/*<Link to={"/Carts"}>CARTS</Link>*/}
+        </li>
+        <li
+          onMouseEnter={() => setIsAccount(true)}
+          className="relative text-white text-sm font-medium cursor-pointer"
+        >
+          {/* Account button */}
+          <div className="flex items-center gap-1 hover:opacity-80">
+            <FaUser className="text-sm" />
+            ACCOUNT
+          </div>
+
+          {/* Dropdown */}
+          {isAccount && (
+            <ul
+              onMouseLeave={() => setIsAccount(false)}
+              className="absolute top-full left-0 mt-2 w-40 bg-white text-black shadow-lg rounded-md overflow-hidden"
+            >
+              <li
+                onClick={openLogin}
+                className="px-4 py-2 hover:bg-gray-100 cursor-pointer"
+              >
+                SIGN-IN
+              </li>
+              <li
+                onClick={openRegister}
+                className="px-4 py-2 hover:bg-blue-100 cursor-pointer"
+              >
+                Create Account
+              </li>
+            </ul>
+          )}
         </li>
       </ul>
       <CartDrawer isOpen={isCartOpen} onClose={closeCart} />
       <LoginModal isOpen={isLoginOpen} onClose={closeLogin} />
+      <RegisterModal isOpen={isRegisterOpen} onClose={closeRegister} />
     </nav>
   );
 }

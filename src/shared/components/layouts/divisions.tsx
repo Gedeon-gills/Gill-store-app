@@ -5,7 +5,7 @@ interface DivisionsProps {
 
 export default function Divisions({ title, items }: DivisionsProps) {
   return (
-    <aside className="border border-gray-200 ml-50 mt-30 bg-white">
+    <aside className="border border-gray-200   bg-white">
       {/* Title */}
       <div className="px-5 py-4 border-b border-gray-200">
         <h3 className="text-[16px] font-semibold text-blue-600">{title}</h3>

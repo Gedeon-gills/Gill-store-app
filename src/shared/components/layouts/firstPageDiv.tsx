@@ -12,7 +12,7 @@ export default function HeroSlider() {
   }, []);
 
   return (
-    <div className="relative h-[70vh] w-[50vw] mx-40 overflow-hidden">
+    <div className="relative h-[70vh] w-[50vw] overflow-hidden">
       {slides[index].type === "video" ? (
         <video
           src={slides[index].src}

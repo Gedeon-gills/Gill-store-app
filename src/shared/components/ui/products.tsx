@@ -3,23 +3,35 @@ import { products } from "../../store/products";
 
 interface ProductsProps {
   limit?: number;
-  category?: string; // 👈 optional
+  category?: string;
+  random?: boolean;
 }
 
-export default function Products({ limit, category }: ProductsProps) {
-  const displayedProducts = products
-    .filter((product) => {
-      if (!category) return true;
+function shuffleArray<T>(array: T[]) {
+  return [...array].sort(() => Math.random() - 0.5);
+}
 
-      return product.category?.toLowerCase() === category.toLowerCase();
-    })
-    .slice(0, limit);
+export default function Products({
+  limit,
+  category,
+  random = false,
+}: ProductsProps) {
+  // Filter products by category if provided
+  let displayedProducts = category
+    ? products.filter((product) => product.category.includes(category))
+    : [...products];
+
+  // Shuffle if random
+  if (random) displayedProducts = shuffleArray(displayedProducts);
+
+  // Limit number of products
+  if (limit) displayedProducts = displayedProducts.slice(0, limit);
 
   return (
-    <div className="flex flex-wrap px-10 mt-7 ml-12 gap-7">
-      {displayedProducts.map((product) => (
+    <div className="flex flex-wrap gap-7 justify-center px-4">
+      {displayedProducts.map((product, index) => (
         <ProductHomeCard
-          key={product.id}
+          key={`${product.id}-${index}`} // unique key
           id={product.id}
           name={product.name}
           description={product.breadcrumb}
