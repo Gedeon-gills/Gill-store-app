@@ -7,8 +7,6 @@ import Divisions from "../layouts/divisions";
 import DivStarter from "../ui/DivStarter";
 import Products from "../ui/products";
 import ContentWrapper from "../ui/contentLapup";
-import { CatgoriesArr } from "../../store/Categories";
-
 export default function Home() {
   return (
     <div>
@@ -75,7 +73,7 @@ export default function Home() {
             />
           </div>
           <div className="col-span-9">
-            <Products random limit={6} /> {/* no category, shows all */}
+            <Products random limit={6} />
           </div>
         </div>
       </ContentWrapper>
