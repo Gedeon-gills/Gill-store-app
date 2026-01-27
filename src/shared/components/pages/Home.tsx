@@ -35,7 +35,7 @@ export default function Home() {
             />
           </div>
           <div className="col-span-9">
-            <Products random limit={6} category="men" />   
+            <Products random limit={6} category="men" />
           </div>
         </div>
 

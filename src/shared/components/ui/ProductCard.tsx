@@ -1,10 +1,4 @@
-import {
-  FaShuffle,
-  FaHeart,
-  FaCartShopping,
-  FaSearchengin,
-} from "react-icons/fa6";
-import { useState } from "react";
+import { FaHeart } from "react-icons/fa6";
 import { Link } from "react-router-dom";
 
 interface ProductsIn {
@@ -17,8 +11,6 @@ interface ProductsIn {
 }
 
 export default function ProductHomeCard(props: ProductsIn) {
-  const [hovered, setHovered] = useState(false);
-
   return (
     <Link to={`/product/${props.id}`} className="group relative block">
       {/* Badges */}

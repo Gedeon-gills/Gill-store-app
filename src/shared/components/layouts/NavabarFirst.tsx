@@ -64,7 +64,8 @@ export default function FirstNavBar() {
           <FaBook className="text-[10px]" /> <Link to={"/FAQ"}>FAQ</Link>
         </li>
         <li className="flex items-center gap-1.5 cursor-pointer hover:text-gray-200">
-          <FaPhone className="text-[10px]" /> <Link to={"/ContactUs"}>CONTACT US</Link>
+          <FaPhone className="text-[10px]" />{" "}
+          <Link to={"/ContactUs"}>CONTACT US</Link>
         </li>
       </ul>
     </nav>

@@ -38,7 +38,7 @@ const Checkout = () => {
   const total = subtotal + shipping;
 
   return (
-    <   Layout>
+    <Layout>
       <div className="min-h-screen bg-[#121212] text-white">
         <div className="bg-[#1c1c1c] border-b border-white/10">
           <div className="max-w-6xl mx-auto px-4 py-6 text-sm text-white/70">

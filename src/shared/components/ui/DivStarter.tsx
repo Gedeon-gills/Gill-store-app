@@ -1,5 +1,4 @@
 import { Link } from "react-router-dom";
-import ContentWrapper from "./contentLapup";
 
 interface props {
   description: string;
