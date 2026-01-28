@@ -67,7 +67,6 @@ export default function Footer() {
           ))}
         </ul>
 
-        {/* Account */}
         <ul className="space-y-3">
           <li className="text-white font-semibold uppercase">My Account</li>
           {[

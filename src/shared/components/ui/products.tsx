@@ -31,13 +31,8 @@ export default function Products({
     <div className="flex flex-wrap gap-7 justify-center px-4">
       {displayedProducts.map((product, index) => (
         <ProductHomeCard
-          key={`${product.id}-${index}`} // unique key
-          id={product.id}
-          name={product.name}
-          description={product.breadcrumb}
-          Image={product.images[0]}
-          price={product.price}
-          priceDown={product.oldPrice}
+          key={`${product.id}-${index}`}
+          {...product}
         />
       ))}
     </div>

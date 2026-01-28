@@ -8,12 +8,7 @@ export default function HomeProducts() {
       {products.map((product) => (
         <ProductHomeCard
           key={product.id}
-          id={product.id} // IMPORTANT: pass the correct id
-          name={product.name}
-          description={product.breadcrumb} // Use breadcrumb or description field
-          Image={product.images[0]} // MUST match your products array
-          price={product.price}
-          priceDown={product.oldPrice} // optional
+          {...product}
         />
       ))}
     </div>

@@ -1,4 +1,3 @@
-// src/store/products.ts
 
 export interface Product {
   id: number;
@@ -15,11 +14,10 @@ export interface Product {
   owner?: string; // optional
   date?: string; // optional
 }
-// helper to ensure 4 duplicated images
 const four = (img: string) => Array(4).fill(img);
 
 export const products: Product[] = [
-  {
+{
     id: 0,
     name: "Men's Casual Sneakers",
     breadcrumb: "Men / Shoes",

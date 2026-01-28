@@ -6,8 +6,6 @@ import ProductHomeCard from "../ui/ProductCard";
 
 export default function CategoriesWeb() {
   const { name } = useParams<{ name: string }>();
-
-  // Filter products by category
   const categoryProducts = products.filter(
     (p) => p.category.toLowerCase() === name?.toLowerCase(),
   );
@@ -21,19 +19,14 @@ export default function CategoriesWeb() {
         {categoryProducts.length === 0 ? (
           <p className="text-gray-500">No products found in this category.</p>
         ) : (
-          <div className="grid grid-cols-4 gap-6">
+        <div className="grid grid-cols-4 gap-6">
             {categoryProducts.map((product) => (
               <ProductHomeCard
                 key={product.id}
-                id={product.id} // this allows clicking to product page
-                name={product.name}
-                description={product.category}
-                Image={product.images[0]}
-                price={product.price}
-                priceDown={product.oldPrice}
+                {...product}
               />
             ))}
-          </div>
+        </div>
         )}
       </div>
       <Footer />

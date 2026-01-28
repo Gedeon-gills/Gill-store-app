@@ -21,7 +21,7 @@ const filters = [
 export default function ShopSidebar() {
   const [openIndex, setOpenIndex] = useState(null);
 
-  const toggle = (index:any) => {
+  const toggle = (index: any) => {
     setOpenIndex(openIndex === index ? null : index);
   };
 
@@ -29,7 +29,6 @@ export default function ShopSidebar() {
     <div className="w-full max-w-xs ml-40 mt-20 p-4 space-y-4">
       {filters.map((filter, index) => (
         <div key={index}>
-          {/* Header */}
           <button
             className="w-full flex justify-between items-center py-2 border-b focus:outline-none"
             onClick={() => toggle(index)}
@@ -42,7 +41,6 @@ export default function ShopSidebar() {
             />
           </button>
 
-          {/* Content */}
           <div
             className={`overflow-hidden transition-all duration-300 ${
               openIndex === index ? "max-h-40 mt-2" : "max-h-0"

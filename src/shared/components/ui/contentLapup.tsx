@@ -4,7 +4,6 @@ interface ContentWrapperProps {
   children: ReactNode;
   className?: string;
 }
-
 export default function ContentWrapper({
   children,
   className = "",
