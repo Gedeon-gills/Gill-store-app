@@ -45,7 +45,6 @@ export default function SecondNavBar() {
         >
           <FaShoppingBag className="text-sm" />
           CARTS
-          {/*<Link to={"/Carts"}>CARTS</Link>*/}
         </li>
         <li
           onMouseEnter={() => setIsAccount(true)}
