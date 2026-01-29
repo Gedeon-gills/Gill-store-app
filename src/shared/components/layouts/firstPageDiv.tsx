@@ -20,7 +20,10 @@ export default function HeroSlider() {
           muted
           loop
           playsInline
-          className="absolute inset-0 w-full h-full object-cover"
+          controls={false}
+          disablePictureInPicture
+          onContextMenu={(e) => e.preventDefault()}
+          className="absolute inset-0 w-full h-full object-cover pointer-events-none"
         />
       ) : (
         <img
