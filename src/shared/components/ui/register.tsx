@@ -91,10 +91,11 @@ const RegisterModal: React.FC<LoginModalProps> = ({ isOpen, onClose }) => {
     console.log(formData);
 
     mutation.mutate({
-      name: formData.username,
+      username: formData.username,
       email: formData.email,
       password: formData.password,
       phone: formData.phone,
+      UserType: "customer" as "admin"|"vendor"|"customer"
     });
 
     // navigate("/"); // Redirect after success

@@ -11,7 +11,6 @@ export default function SecondNavBar() {
   const [isRegisterOpen, setIsRegisterOpen] = useState(false);
   const [isAccount, setIsAccount] = useState(false);
   const openLogin = () => setIsLoginOpen(true);
-  const openRegister = () => setIsRegisterOpen(true);
   const closeRegister = () => setIsRegisterOpen(false);
   const closeLogin = () => setIsLoginOpen(false);
   const openCart = () => setIsCartOpen(true);
