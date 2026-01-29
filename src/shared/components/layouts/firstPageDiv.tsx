@@ -1,7 +1,8 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import { slides } from "../../../Assets/images/Slides";
 export default function HeroSlider() {
   const [index, setIndex] = useState(0);
+  const videoRef = useRef<HTMLVideoElement>(null);
 
   useEffect(() => {
     const interval = setInterval(() => {
@@ -11,10 +12,26 @@ export default function HeroSlider() {
     return () => clearInterval(interval);
   }, []);
 
+  useEffect(() => {
+    // Force video to play when it becomes active
+    if (slides[index].type === "video" && videoRef.current) {
+      const video = videoRef.current;
+      video.load(); // Reload the video
+      const playPromise = video.play();
+      if (playPromise !== undefined) {
+        playPromise.catch(() => {
+          // Autoplay failed, but that's okay for mobile
+          console.log('Autoplay prevented by browser');
+        });
+      }
+    }
+  }, [index]);
+
   return (
     <div className="relative h-48 sm:h-64 lg:h-[70vh] w-full lg:w-[50vw] overflow-hidden">
       {slides[index].type === "video" ? (
         <video
+          ref={videoRef}
           src={slides[index].src}
           autoPlay
           muted
@@ -23,6 +40,7 @@ export default function HeroSlider() {
           controls={false}
           disablePictureInPicture
           onContextMenu={(e) => e.preventDefault()}
+          preload="metadata"
           className="absolute inset-0 w-full h-full object-cover pointer-events-none"
         />
       ) : (
