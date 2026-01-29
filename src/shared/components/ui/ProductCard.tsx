@@ -1,10 +1,12 @@
-import { FaHeart, FaRegHeart } from "react-icons/fa6";
+import { FaHeart, FaRegHeart, FaEye, FaShoppingCart } from "react-icons/fa";
 import { Link } from "react-router-dom";
 import { useWishlist } from "../layouts/wishlistcontext";
+import { useCart } from "../layouts/cartcontext";
 import type { Product } from "../../store/products";
 
 export default function ProductHomeCard(props: Product) {
   const { addToWishlist, removeFromWishlist, isInWishlist } = useWishlist();
+  const { addToCart } = useCart();
   const inWishlist = isInWishlist(props.id);
 
   const handleWishlistClick = (e: React.MouseEvent) => {
@@ -16,16 +18,19 @@ export default function ProductHomeCard(props: Product) {
     }
   };
 
+  const handleAddToCart = (e: React.MouseEvent) => {
+    e.preventDefault();
+    addToCart(props);
+  };
+
   const discountPercentage = props.oldPrice
     ? Math.round(((props.oldPrice - props.price) / props.oldPrice) * 100)
     : 0;
-  console.log(props.oldPrice, props.price, props.priceDown, props.images);
-  console.log(import.meta.env.VITE_APP_API_URL + "/" + props?.images);
 
   return (
-    <Link to={`/product/${props.id}`} className="group relative block w-full">
+    <div className="group relative bg-white transition-all duration-300 hover:shadow-xl hover:shadow-black/10 rounded overflow-hidden m-1 sm:m-2 lg:m-3">
       {/* Badges */}
-      <div className="absolute top-2 left-2 z-10 flex flex-col gap-1">
+      <div className="absolute top-2 left-2 z-20 flex flex-col gap-1">
         {props.oldPrice && (
           <span className="bg-green-600 px-2 py-1 text-[10px] sm:text-xs font-medium text-white rounded">
             {discountPercentage}% OFF
@@ -35,47 +40,68 @@ export default function ProductHomeCard(props: Product) {
           Featured
         </span>
       </div>
+      
       {/* Wishlist Button */}
       <button
         type="button"
         onClick={handleWishlistClick}
-        className="absolute right-2 top-2 z-10 rounded-full bg-white p-1.5 sm:p-2 opacity-0 transition-opacity group-hover:opacity-100 shadow-md"
+        className="absolute right-3 top-3 z-20 rounded-full bg-white p-2 opacity-0 transition-opacity duration-300 group-hover:opacity-100 shadow-md"
       >
         {inWishlist ? (
-          <FaHeart size={14} className="sm:w-[18px] sm:h-[18px] text-red-500" />
+          <FaHeart size={16} className="text-red-500" />
         ) : (
-          <FaRegHeart size={14} className="sm:w-[18px] sm:h-[18px] text-gray-400 hover:text-red-500" />
+          <FaRegHeart size={16} className="text-gray-400 hover:text-red-500" />
         )}
       </button>
+      
       {/* Product Image */}
-      <div className="mb-2 sm:mb-3 overflow-hidden rounded bg-gray-100">
+      <div className="relative overflow-hidden">
         {props.images && (
           <img
             src={props.images[0]}
             alt={props.name}
-            className="h-48 sm:h-64 lg:h-80 w-full object-cover transition-transform duration-300 group-hover:scale-105"
+            className="h-40 sm:h-48 lg:h-56 w-full object-cover transition-transform duration-500 group-hover:scale-110"
           />
         )}
+        
+        {/* Hover Actions */}
+        <div className="absolute bottom-0 left-0 w-full bg-blue-600/90 flex justify-center gap-4 p-3 transform translate-y-full transition-transform duration-300 group-hover:translate-y-0">
+          <button
+            onClick={handleAddToCart}
+            className="bg-white text-blue-600 p-2 rounded-full hover:bg-gray-100 transition-colors"
+            title="Add to Cart"
+          >
+            <FaShoppingCart size={16} />
+          </button>
+          <Link
+            to={`/product/${props.id}`}
+            className="bg-white text-blue-600 p-2 rounded-full hover:bg-gray-100 transition-colors"
+            title="Quick View"
+          >
+            <FaEye size={16} />
+          </Link>
+        </div>
       </div>
+      
       {/* Product Info */}
-      <div className="px-1">
-        <h3 className="mb-1 text-xs sm:text-sm font-medium text-gray-800 line-clamp-2 leading-tight">
+      <Link to={`/product/${props.id}`} className="block p-3">
+        <h3 className="mb-2 text-sm font-medium text-gray-800 line-clamp-2 leading-tight">
           {props.name}
         </h3>
-        <div className="flex items-center gap-1 sm:gap-2 mb-1">
-          <span className="font-bold text-gray-900 text-sm sm:text-base">${props.price}</span>
+        <div className="flex items-center gap-2 mb-2">
+          <span className="font-bold text-gray-900 text-base">${props.price}</span>
           {props.oldPrice && (
-            <span className="text-xs sm:text-sm text-gray-400 line-through">
+            <span className="text-sm text-gray-400 line-through">
               ${props.oldPrice}
             </span>
           )}
         </div>
         <div>
-          <span className="text-[10px] sm:text-xs text-green-600 font-medium">
+          <span className="text-xs text-green-600 font-medium">
             {props.availability}
           </span>
         </div>
-      </div>
-    </Link>
+      </Link>
+    </div>
   );
 }

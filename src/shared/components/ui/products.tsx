@@ -53,21 +53,20 @@ export default function Products({
   if (error) return <div className="text-center text-red-500">{error}</div>;
 
   return (
-    <div className="flex flex-wrap gap-4 sm:gap-6 lg:gap-7 justify-center px-2 sm:px-4">
+    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 sm:gap-6 px-2 sm:px-4">
       {products.map((product, index) => (
-        <div key={`${product._id}-${index}`} className="w-full sm:w-[calc(50%-12px)] md:w-[calc(33.333%-16px)] lg:w-[calc(25%-21px)] xl:w-[calc(20%-22px)] max-w-[280px]">
-          <ProductHomeCard
-            id={product._id}
-            name={product.name}
-            price={product.price}
-            images={product.Images}
-            category={product.category.name}
-            breadcrumb=""
-            description=""
-            availability={product.inStock ? "In Stock" : "Out of Stock"}
-            sku={product._id}
-          />
-        </div>
+        <ProductHomeCard
+          key={`${product._id}-${index}`}
+          id={product._id}
+          name={product.name}
+          price={product.price}
+          images={product.Images}
+          category={product.category.name}
+          breadcrumb=""
+          description=""
+          availability={product.inStock ? "In Stock" : "Out of Stock"}
+          sku={product._id}
+        />
       ))}
     </div>
   );

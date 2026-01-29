@@ -9,11 +9,9 @@ import ContactUs from "./shared/components/pages/contactUs";
 import FAQ from "./shared/components/pages/F&Q";
 import Favourites from "./shared/components/pages/favourites";
 import Shop from "./shared/components/pages/shop";
-import RegisterLogin from "./shared/components/pages/RegisterLogin";
 import ProductPage from "./shared/components/pages/prodWeb";
 import CategoriesWeb from "./shared/components/pages/categoryWeb";
 import Checkout from "./shared/components/layouts/checkout";
-
 export default function App() {
   return (
     <CartProvider>
@@ -21,7 +19,6 @@ export default function App() {
         <BrowserRouter>
           <Routes>
             <Route path="/" element={<Home />} />
-            <Route path="/Register" element={<RegisterLogin />} />
             <Route path="/blogs" element={<Blogs />} />
             <Route path="/product/:id" element={<ProductPage />} />
             <Route path="/Carts" element={<Carts />} />

@@ -13,13 +13,8 @@ const RegisterModal: React.FC<LoginModalProps> = ({ isOpen, onClose }) => {
   const [showPassword, setShowPassword] = useState(false);
 
   const mutation = useMutation({
-    mutationFn: userService.createUser, // The function that creates the user
-
-    // Step 3: Handle success
+    mutationFn: userService.createUser,
     onSuccess: (data) => {
-      // Invalidate the users list so it refetches with the new user
-      //  queryClient.invalidateQueries({ queryKey: ["users"] });
-
       console.log(data);
     },
 
@@ -35,7 +30,6 @@ const RegisterModal: React.FC<LoginModalProps> = ({ isOpen, onClose }) => {
     phone: string;
     rememberMe: boolean;
   }
-  // Controlled form state
   const [formData, setFormData] = useState<userOne>({
     username: "",
     email: "",
