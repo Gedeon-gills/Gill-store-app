@@ -45,7 +45,7 @@ export default function Products({
     };
 
     fetchProducts();
-  }, []);
+  }, [limit, category, random]);
 
   console.log("Products data:", products);
 
