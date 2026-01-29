@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useCart } from "./cartcontext";
+import { OrderService } from "../../services/order";
 import Layout from "./layout";
 import type { Product } from "../../store/products";
 
@@ -38,11 +39,21 @@ const Checkout = () => {
     e.preventDefault();
     setIsProcessing(true);
     
-    // Simulate order processing
-    await new Promise(resolve => setTimeout(resolve, 2000));
-    
-    setIsProcessing(false);
-    setOrderComplete(true);
+    try {
+      await OrderService.createOrder({
+        orderId: `ORDER-${Date.now()}`,
+        cartName: `${formData.firstName} ${formData.lastName}`,
+        totalAmount: total,
+        timeOrderPlaced: new Date(),
+      });
+      
+      setOrderComplete(true);
+    } catch (error) {
+      console.error('Order creation failed:', error);
+      alert('Order failed. Please try again.');
+    } finally {
+      setIsProcessing(false);
+    }
   };
 
   if (cart.length === 0) {

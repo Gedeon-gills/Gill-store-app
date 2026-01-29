@@ -2,9 +2,9 @@ import FirstCard from "../layouts/firstCard";
 import HeroSlider from "../layouts/firstPageDiv";
 export default function FirstDivision() {
   return (
-    <div className="flex ">
+    <div className="flex flex-col lg:flex-row gap-4 lg:gap-0">
       <HeroSlider />
-      <div>
+      <div className="flex flex-row lg:flex-col gap-2 lg:gap-0">
         <FirstCard
           image="https://i.pinimg.com/1200x/a7/02/9f/a7029f972e9d3d71e2c25973dfc0f646.jpg"
           label="FOR MEN"

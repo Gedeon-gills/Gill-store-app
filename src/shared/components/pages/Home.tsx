@@ -21,8 +21,8 @@ export default function Home() {
 
         {/* MEN'S FASHION */}
         <DivStarter description="MEN'S FASHION" />
-        <div className="grid grid-cols-12 gap-6">
-          <div className="col-span-3">
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-4 lg:gap-6">
+          <div className="lg:col-span-3">
             <Divisions
               title="Men"
               items={[
@@ -34,30 +34,29 @@ export default function Home() {
               ]}
             />
           </div>
-          <div className="col-span-9">
-            <Products random limit={6} category="men" />
+          <div className="lg:col-span-9">
+            <Products random limit={6} />
           </div>
         </div>
 
         {/* WOMEN'S FASHION */}
         <DivStarter description="WOMEN'S FASHION" />
-        <div className="grid grid-cols-12 gap-6">
-          <div className="col-span-3">
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-4 lg:gap-6">
+          <div className="lg:col-span-3">
             <Divisions
               title="Women"
               items={["Tops", "Dresses", "Nightwear", "Jeans", "Jewellery"]}
             />
           </div>
-          <div className="col-span-9">
-            <Products random limit={6} category="women" />{" "}
-            {/* <-- category added */}
+          <div className="lg:col-span-9">
+            <Products random limit={6} />
           </div>
         </div>
 
         {/* POPULAR PRODUCTS */}
         <DivStarter description="POPULAR" />
-        <div className="grid grid-cols-12 gap-6">
-          <div className="col-span-3 ml-28">
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-4 lg:gap-6">
+          <div className="lg:col-span-3 lg:ml-28">
             <Divisions
               title="Popular Fashion"
               items={[
@@ -72,7 +71,7 @@ export default function Home() {
               ]}
             />
           </div>
-          <div className="col-span-9">
+          <div className="lg:col-span-9">
             <Products random limit={6} />
           </div>
         </div>

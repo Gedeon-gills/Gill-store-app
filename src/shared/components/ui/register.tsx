@@ -1,6 +1,7 @@
 import React, { useState } from "react";
-import { X, Eye, EyeOff } from "lucide-react"; // Added EyeOff
-import { useNavigate } from "react-router-dom";
+import { X, Eye, EyeOff } from "lucide-react";
+import { useMutation } from "@tanstack/react-query";
+import { userService } from "../../services/userService";
 
 interface LoginModalProps {
   isOpen: boolean;
@@ -8,18 +9,95 @@ interface LoginModalProps {
 }
 
 const RegisterModal: React.FC<LoginModalProps> = ({ isOpen, onClose }) => {
-  const navigate = useNavigate();
   const [isRegisterView, setIsRegisterView] = useState(true);
-
-  // 1. Create state to track password visibility
   const [showPassword, setShowPassword] = useState(false);
+
+  const mutation = useMutation({
+    mutationFn: userService.createUser, // The function that creates the user
+
+    // Step 3: Handle success
+    onSuccess: (data) => {
+      // Invalidate the users list so it refetches with the new user
+      //  queryClient.invalidateQueries({ queryKey: ["users"] });
+
+      console.log(data);
+    },
+
+    // Step 4: Handle errors
+    onError: (error) => {
+      console.error("Error creating user:", error);
+    },
+  });
+  interface userOne {
+    username: string;
+    email: string;
+    password: string;
+    phone: string;
+    rememberMe: boolean;
+  }
+  // Controlled form state
+  const [formData, setFormData] = useState<userOne>({
+    username: "",
+    email: "",
+    phone: "",
+    password: "",
+    rememberMe: false,
+  });
+
+  const [errors, setErrors] = useState<{ [key: string]: string }>({});
 
   if (!isOpen) return null;
 
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const { name, value, type, checked } = e.target;
+    setFormData((prev) => ({
+      ...prev,
+      [name]: type === "checkbox" ? checked : value,
+    }));
+  };
+
+  const validate = () => {
+    const newErrors: { [key: string]: string } = {};
+
+    if (!formData.username) newErrors.username = "Username is required";
+    if (!formData.email) newErrors.email = "Email is required";
+    else if (!/^[\w-.]+@([\w-]+\.)+[\w-]{2,4}$/.test(formData.email))
+      newErrors.email = "Invalid email format";
+
+    if (
+      !isRegisterView &&
+      formData.phone &&
+      !/^\d{10,15}$/.test(formData.phone)
+    )
+      newErrors.phone = "Phone number must be 10-15 digits";
+
+    if (!formData.password) newErrors.password = "Password is required";
+    else if (formData.password.length < 6)
+      newErrors.password = "Password must be at least 6 characters";
+
+    setErrors(newErrors);
+
+    return Object.keys(newErrors).length === 0;
+  };
+
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    onClose();
-    navigate("/");
+    if (!validate()) return;
+
+    // Handle successful registration/login
+    console.log("Form Data:", formData);
+    // onClose();
+
+    console.log(formData);
+
+    mutation.mutate({
+      name: formData.username,
+      email: formData.email,
+      password: formData.password,
+      phone: formData.phone,
+    });
+
+    // navigate("/"); // Redirect after success
   };
 
   return (
@@ -52,36 +130,66 @@ const RegisterModal: React.FC<LoginModalProps> = ({ isOpen, onClose }) => {
         {/* Right Side */}
         <div className="p-12 md:w-[60%] bg-white">
           <form className="space-y-6" onSubmit={handleSubmit}>
+            {/* Username / Email */}
             <div className="border-b border-gray-200">
               <input
                 required
+                name="username"
+                value={formData.username}
+                onChange={handleChange}
                 type="text"
-                placeholder="Enter Username/Email address"
+                placeholder="Enter Username"
                 className="w-full py-3 outline-none focus:border-blue-600 text-sm"
               />
+              {errors.username && (
+                <p className="text-red-500 text-xs mt-1">{errors.username}</p>
+              )}
             </div>
 
+            {/* Email */}
+            <div className="border-b border-gray-200">
+              <input
+                required
+                name="email"
+                value={formData.email}
+                onChange={handleChange}
+                type="email"
+                placeholder="Enter Email"
+                className="w-full py-3 outline-none focus:border-blue-600 text-sm"
+              />
+              {errors.email && (
+                <p className="text-red-500 text-xs mt-1">{errors.email}</p>
+              )}
+            </div>
+
+            {/* Phone for Sign Up */}
             {!isRegisterView && (
               <div className="border-b border-gray-200">
                 <input
-                  required
+                  name="phone"
+                  value={formData.phone}
+                  onChange={handleChange}
                   type="tel"
                   placeholder="Enter Mobile Number"
                   className="w-full py-3 outline-none focus:border-blue-600 text-sm"
                 />
+                {errors.phone && (
+                  <p className="text-red-500 text-xs mt-1">{errors.phone}</p>
+                )}
               </div>
             )}
 
+            {/* Password */}
             <div className="relative border-b border-gray-200">
-              {/* 2. Change 'type' dynamically based on showPassword state */}
               <input
                 required
+                name="password"
+                value={formData.password}
+                onChange={handleChange}
                 type={showPassword ? "text" : "password"}
                 placeholder="Enter Password"
                 className="w-full py-3 outline-none focus:border-blue-600 text-sm"
               />
-
-              {/* 3. Toggle showPassword on click */}
               <button
                 type="button"
                 onClick={() => setShowPassword(!showPassword)}
@@ -89,11 +197,21 @@ const RegisterModal: React.FC<LoginModalProps> = ({ isOpen, onClose }) => {
               >
                 {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
               </button>
+              {errors.password && (
+                <p className="text-red-500 text-xs mt-1">{errors.password}</p>
+              )}
             </div>
 
+            {/* Remember Me */}
             <div className="flex items-center justify-between text-xs pt-2">
               <label className="flex items-center gap-2 cursor-pointer font-medium text-gray-600">
-                <input type="checkbox" className="accent-blue-600 w-4 h-4" />{" "}
+                <input
+                  type="checkbox"
+                  name="rememberMe"
+                  checked={formData.rememberMe}
+                  onChange={handleChange}
+                  className="accent-blue-600 w-4 h-4"
+                />
                 Remember me
               </label>
             </div>
@@ -102,7 +220,7 @@ const RegisterModal: React.FC<LoginModalProps> = ({ isOpen, onClose }) => {
               type="submit"
               className="w-full bg-[#2b78ef] text-white font-bold py-4 rounded-sm shadow-lg hover:bg-blue-700 transition-all uppercase tracking-widest text-xs"
             >
-              SIGN-UP
+              {isRegisterView ? "LOGIN" : "SIGN-UP"}
             </button>
 
             <div className="text-center pt-4">
@@ -110,7 +228,8 @@ const RegisterModal: React.FC<LoginModalProps> = ({ isOpen, onClose }) => {
                 type="button"
                 onClick={() => {
                   setIsRegisterView(!isRegisterView);
-                  setShowPassword(false); // Reset eye icon when switching views
+                  setShowPassword(false);
+                  setErrors({});
                 }}
                 className="text-[#2b78ef] text-sm font-bold hover:underline"
               >

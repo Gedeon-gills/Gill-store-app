@@ -26,7 +26,7 @@ export default function ShopSidebar() {
   };
 
   return (
-    <div className="w-full max-w-xs ml-40 mt-20 p-4 space-y-4">
+    <div className="w-full lg:w-full lg:max-w-xs lg:ml-40 mt-4 lg:mt-20 p-4 space-y-3 lg:space-y-4">
       {filters.map((filter, index) => (
         <div key={index}>
           <button
@@ -35,7 +35,7 @@ export default function ShopSidebar() {
           >
             <span className="text-sm font-medium">{filter.title}</span>
             <FaChevronDown
-              className={`transition-transform duration-300 ${
+              className={`transition-transform duration-300 text-xs ${
                 openIndex === index ? "rotate-180" : ""
               }`}
             />
@@ -46,9 +46,9 @@ export default function ShopSidebar() {
               openIndex === index ? "max-h-40 mt-2" : "max-h-0"
             }`}
           >
-            <ul className="flex flex-col gap-2 text-sm">
+            <ul className="flex flex-col gap-1.5 lg:gap-2 text-xs lg:text-sm">
               {filter.items.map((item, idx) => (
-                <li key={idx} className="cursor-pointer hover:text-blue-500">
+                <li key={idx} className="cursor-pointer hover:text-blue-500 transition-colors">
                   {item}
                 </li>
               ))}
@@ -56,7 +56,7 @@ export default function ShopSidebar() {
           </div>
 
           {/* Bottom blue line */}
-          <div className="h-[2px] w-8 bg-blue-500 mt-1"></div>
+          <div className="h-[2px] w-6 lg:w-8 bg-blue-500 mt-1"></div>
         </div>
       ))}
     </div>
