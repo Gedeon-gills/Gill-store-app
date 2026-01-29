@@ -1,4 +1,5 @@
-import { FaCartShopping, FaHeart, FaUser, FaHome, FaSearch } from "react-icons/fa6";
+import { FaCartShopping, FaHeart, FaUser, FaMagnifyingGlass } from "react-icons/fa6";
+import { FaHome } from "react-icons/fa";
 import { Link } from "react-router-dom";
 import { useState, useEffect } from "react";
 import { useLocation } from "react-router-dom";
@@ -58,7 +59,7 @@ export default function StickyNavBar() {
               placeholder="Search..."
               className="bg-transparent text-white placeholder-gray-200 outline-none text-xs sm:text-sm w-20 sm:w-32"
             />
-            <FaSearch className="text-white text-xs ml-1" />
+            <FaMagnifyingGlass className="text-white text-xs ml-1" />
           </div>
         </div>
 
