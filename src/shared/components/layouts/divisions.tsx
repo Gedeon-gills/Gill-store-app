@@ -1,3 +1,5 @@
+import { Link } from "react-router-dom";
+
 interface DivisionsProps {
   title: string;
   items: string[]
@@ -14,11 +16,13 @@ export default function Divisions({ title, items }: DivisionsProps) {
       {/* Category list */}
       <ul className="px-5 py-4 space-y-4 text-[14px] text-gray-700">
         {items.map((item, index) => (
-          <li
-            key={index}
-            className="cursor-pointer transition-colors duration-200 hover:text-blue-600"
-          >
-            {item}
+          <li key={index}>
+            <Link
+              to={`/category/${item.toLowerCase().replace(/\s+/g, '-').replace(/&/g, 'and')}`}
+              className="cursor-pointer transition-colors duration-200 hover:text-blue-600 block"
+            >
+              {item}
+            </Link>
           </li>
         ))}
       </ul>

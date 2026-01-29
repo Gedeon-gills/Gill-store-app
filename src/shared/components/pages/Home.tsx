@@ -35,7 +35,7 @@ export default function Home() {
             />
           </div>
           <div className="lg:col-span-9">
-            <Products random limit={6} />
+            <Products category="Men" random limit={6} />
           </div>
         </div>
 
@@ -49,7 +49,7 @@ export default function Home() {
             />
           </div>
           <div className="lg:col-span-9">
-            <Products random limit={6} />
+            <Products category="Women" random limit={6} />
           </div>
         </div>
 

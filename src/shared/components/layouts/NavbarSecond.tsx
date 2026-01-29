@@ -1,4 +1,4 @@
-import { FaSearch, FaShoppingBag, FaUser, FaHeart } from "react-icons/fa";
+import { FaSearch, FaShoppingBag, FaUser, FaHeart, FaBlog } from "react-icons/fa";
 import { Link, useNavigate } from "react-router-dom";
 import CartDrawer from "../ui/cartsPopup";
 import { useState } from "react";
@@ -47,28 +47,48 @@ export default function SecondNavBar() {
         
         {/* ACTIONS */}
         <div className="flex items-center gap-4 sm:gap-6 order-2 sm:order-3">
+          {/* SHOP */}
+          <li className="p-2 sm:p-1 rounded-lg sm:rounded-none hover:bg-blue-700 sm:hover:bg-transparent transition-colors">
+            <Link to={"/shop"} className="flex items-center gap-1 text-white text-xs sm:text-sm font-medium hover:opacity-80">
+              <FaSearch className="text-lg sm:text-sm" />
+              <span className="hidden sm:inline">SHOP</span>
+            </Link>
+          </li>
+
+          {/* BLOGS */}
+          <li className="p-2 sm:p-1 rounded-lg sm:rounded-none hover:bg-blue-700 sm:hover:bg-transparent transition-colors">
+            <Link to={"/blogs"} className="flex items-center gap-1 text-white text-xs sm:text-sm font-medium hover:opacity-80">
+              <FaBlog className="text-lg sm:text-sm" />
+              <span className="hidden sm:inline">BLOGS</span>
+            </Link>
+          </li>
+
           {/* FAVS */}
-          <li className="flex items-center gap-1 text-white text-xs sm:text-sm font-medium cursor-pointer hover:opacity-80">
-            <FaHeart className="text-sm" />
-            <Link to={"/Favourites"} className="hidden sm:inline">FAVS</Link>
+          <li className="p-2 sm:p-1 rounded-lg sm:rounded-none hover:bg-blue-700 sm:hover:bg-transparent transition-colors">
+            <Link to={"/Favourites"} className="flex items-center gap-1 text-white text-xs sm:text-sm font-medium hover:opacity-80">
+              <FaHeart className="text-lg sm:text-sm" />
+              <span className="hidden sm:inline">FAVS</span>
+            </Link>
           </li>
 
           {/* CARTS */}
           <li
             onClick={openCart}
-            className="flex items-center gap-1 text-white text-xs sm:text-sm font-medium cursor-pointer hover:opacity-80"
+            className="p-2 sm:p-1 rounded-lg sm:rounded-none hover:bg-blue-700 sm:hover:bg-transparent transition-colors cursor-pointer"
           >
-            <FaShoppingBag className="text-sm" />
-            <span className="hidden sm:inline">CARTS</span>
+            <div className="flex items-center gap-1 text-white text-xs sm:text-sm font-medium hover:opacity-80">
+              <FaShoppingBag className="text-lg sm:text-sm" />
+              <span className="hidden sm:inline">CARTS</span>
+            </div>
           </li>
           
           <li
             onMouseEnter={() => setIsAccount(true)}
-            className="relative text-white text-xs sm:text-sm font-medium cursor-pointer"
+            className="relative text-white text-xs sm:text-sm font-medium cursor-pointer p-2 sm:p-1 rounded-lg sm:rounded-none hover:bg-blue-700 sm:hover:bg-transparent transition-colors"
           >
             {/* Account button */}
             <div className="flex items-center gap-1 hover:opacity-80">
-              <FaUser className="text-sm" />
+              <FaUser className="text-lg sm:text-sm" />
               <span className="hidden sm:inline">ACCOUNT</span>
             </div>
 
