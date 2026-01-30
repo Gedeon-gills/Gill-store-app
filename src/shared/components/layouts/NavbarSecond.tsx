@@ -5,6 +5,7 @@ import { useState, useEffect } from "react";
 import LoginModal from "../ui/login";
 import RegisterModal from "../ui/register";
 import PageLoader from "../ui/PageLoader";
+import UserAvatar from "../ui/UserAvatar";
 
 export default function SecondNavBar() {
   const [isCartOpen, setIsCartOpen] = useState(false);
@@ -129,18 +130,7 @@ export default function SecondNavBar() {
                 }}
                 className="flex items-center gap-2 hover:opacity-80"
               >
-                {user?.profile ? (
-                  <img 
-                    src={user.profile} 
-                    alt={user.username}
-                    className="w-6 h-6 sm:w-8 sm:h-8 rounded-full object-cover"
-                  />
-                ) : (
-                  <FaUser className="text-lg sm:text-sm" />
-                )}
-                <span className="hidden sm:inline">
-                  {user.username}
-                </span>
+                <UserAvatar user={user} size="md" showUsername={true} />
               </div>
             ) : (
               <div 

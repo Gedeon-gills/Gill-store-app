@@ -6,6 +6,7 @@ import { useLocation } from "react-router-dom";
 import CartDrawer from "../ui/cartsPopup";
 import LoginModal from "../ui/login";
 import PageLoader from "../ui/PageLoader";
+import UserAvatar from "../ui/UserAvatar";
 
 export default function StickyNavBar() {
   const location = useLocation();
@@ -154,18 +155,7 @@ export default function StickyNavBar() {
             className="flex items-center gap-1 cursor-pointer hover:text-gray-200 transition-colors"
           >
             {user ? (
-              <>
-                {user?.profile ? (
-                  <img 
-                    src={user.profile} 
-                    alt={user.username}
-                    className="w-4 h-4 sm:w-5 sm:h-5 rounded-full object-cover"
-                  />
-                ) : (
-                  <FaUser className="text-xs sm:text-sm" />
-                )}
-                <span className="hidden sm:inline">{user.username}</span>
-              </>
+              <UserAvatar user={user} size="sm" showUsername={true} />
             ) : (
               <>
                 <FaUser className="text-xs sm:text-sm" />

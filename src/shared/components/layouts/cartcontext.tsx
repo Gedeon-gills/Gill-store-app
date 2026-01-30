@@ -1,6 +1,7 @@
 import React, { createContext, useContext, useState, useEffect } from "react";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { cartService } from "../../services/cartService";
+import { orderService } from "../../services/orderService";
 import type { Product } from "../../store/products";
 
 interface CartItem extends Product {
@@ -23,6 +24,40 @@ export const CartProvider: React.FC<{ children: React.ReactNode }> = ({
   const [cart, setCart] = useState<CartItem[]>([]);
   const [cartName, setCartName] = useState<string>("");
   const queryClient = useQueryClient();
+
+  // Load cart from backend on mount
+  useEffect(() => {
+    const loadCart = async () => {
+      if (cartName) {
+        try {
+          const cartData = await orderService.getCartItems(cartName);
+          if (cartData && cartData.items) {
+            setCart(cartData.items);
+          }
+        } catch (error) {
+          console.error('Failed to load cart:', error);
+          // Load from localStorage as fallback
+          const localCart = localStorage.getItem(cartName);
+          if (localCart) {
+            try {
+              setCart(JSON.parse(localCart));
+            } catch (e) {
+              console.error('Failed to parse local cart:', e);
+            }
+          }
+        }
+      }
+    };
+
+    loadCart();
+  }, [cartName]);
+
+  // Save cart to localStorage whenever it changes
+  useEffect(() => {
+    if (cartName && cart.length > 0) {
+      localStorage.setItem(cartName, JSON.stringify(cart));
+    }
+  }, [cart, cartName]);
 
   // Get user cart name
   useEffect(() => {
@@ -92,17 +127,20 @@ export const CartProvider: React.FC<{ children: React.ReactNode }> = ({
     }
 
     // Update local state immediately
-    setCart((prev) => {
-      const existing = prev.find((item) => item.id === product.id);
+    const newCart = (() => {
+      const existing = cart.find((item) => item.id === product.id);
       if (existing) {
-        return prev.map((item) =>
+        return cart.map((item) =>
           item.id === product.id
             ? { ...item, quantity: item.quantity + 1 }
             : item,
         );
       }
-      return [...prev, { ...product, quantity: 1 }];
-    });
+      return [...cart, { ...product, quantity: 1 }];
+    })();
+    
+    setCart(newCart);
+    localStorage.setItem(currentCartName, JSON.stringify(newCart));
 
     // Sync with backend
     addToCartMutation.mutate({
@@ -115,11 +153,11 @@ export const CartProvider: React.FC<{ children: React.ReactNode }> = ({
   const increaseQty = (id: string) => {
     const item = cart.find(item => item.id === id);
     if (item && cartName) {
-      setCart((prev) =>
-        prev.map((item) =>
-          item.id === id ? { ...item, quantity: item.quantity + 1 } : item,
-        ),
+      const newCart = cart.map((item) =>
+        item.id === id ? { ...item, quantity: item.quantity + 1 } : item,
       );
+      setCart(newCart);
+      localStorage.setItem(cartName, JSON.stringify(newCart));
       
       addToCartMutation.mutate({
         CartName: cartName,
@@ -134,18 +172,20 @@ export const CartProvider: React.FC<{ children: React.ReactNode }> = ({
     if (item && cartName) {
       if (item.quantity === 1) {
         // Remove from cart
-        setCart((prev) => prev.filter((item) => item.id !== id));
+        const newCart = cart.filter((item) => item.id !== id);
+        setCart(newCart);
+        localStorage.setItem(cartName, JSON.stringify(newCart));
         removeFromCartMutation.mutate({
           CartName: cartName,
           ProductName: item.name
         });
       } else {
         // Decrease quantity
-        setCart((prev) =>
-          prev.map((item) =>
-            item.id === id ? { ...item, quantity: item.quantity - 1 } : item,
-          ),
+        const newCart = cart.map((item) =>
+          item.id === id ? { ...item, quantity: item.quantity - 1 } : item,
         );
+        setCart(newCart);
+        localStorage.setItem(cartName, JSON.stringify(newCart));
       }
     }
   };

@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useCart } from "./cartcontext";
-import { OrderService } from "../../services/order";
+import { orderService } from "../../services/orderService";
 import Layout from "./layout";
 import type { Product } from "../../store/products";
 
@@ -14,6 +14,7 @@ const Checkout = () => {
   const { cart } = useCart();
   const [isProcessing, setIsProcessing] = useState(false);
   const [orderComplete, setOrderComplete] = useState(false);
+  const [orderNumber, setOrderNumber] = useState("");
   const [formData, setFormData] = useState({
     firstName: '',
     lastName: '',
@@ -22,6 +23,7 @@ const Checkout = () => {
     address: '',
     city: '',
     zipCode: '',
+    paymentMethod: 'card'
   });
 
   const subtotal = cart.reduce(
@@ -31,7 +33,7 @@ const Checkout = () => {
   const shipping = cart.length ? 5 : 0;
   const total = subtotal + shipping;
 
-  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
   };
 
@@ -40,11 +42,38 @@ const Checkout = () => {
     setIsProcessing(true);
     
     try {
-      const cartName = `${formData.firstName}_${formData.lastName}_cart`;
+      const user = localStorage.getItem('user');
+      if (!user || user === 'undefined') {
+        alert('Please login to place an order');
+        navigate('/login');
+        return;
+      }
+
+      const userData = JSON.parse(user);
+      const cartName = `${userData.username}_cart`;
       
-      await OrderService.createOrder({
-        cartName: cartName
-      });
+      const orderData = {
+        customerInfo: {
+          name: `${formData.firstName} ${formData.lastName}`,
+          email: formData.email,
+          phone: formData.phone,
+          address: `${formData.address}, ${formData.city}, ${formData.zipCode}`
+        },
+        items: cart.map(item => ({
+          productId: item.id,
+          name: item.name,
+          price: item.price,
+          quantity: item.quantity
+        })),
+        total,
+        paymentMethod: formData.paymentMethod
+      };
+      
+      const result = await orderService.createOrder(orderData);
+      setOrderNumber(result.orderNumber || result._id);
+      
+      // Clear cart after successful order
+      await orderService.clearCart(cartName);
       
       setOrderComplete(true);
     } catch (error) {
@@ -82,8 +111,11 @@ const Checkout = () => {
               </svg>
             </div>
             <h1 className="text-3xl font-bold text-green-800 mb-4">Order Confirmed!</h1>
-            <p className="text-lg text-green-700 mb-6">
-              Thank you for your purchase! Your order is being processed and will be shipped soon.
+            <p className="text-lg text-green-700 mb-2">
+              Thank you for your purchase! Your order #{orderNumber} is being processed.
+            </p>
+            <p className="text-sm text-green-600 mb-6">
+              You will receive a confirmation email shortly.
             </p>
             <div className="bg-white border border-green-200 rounded-lg p-6 mb-6">
               <h2 className="text-xl font-semibold mb-4">Order Summary</h2>
@@ -204,6 +236,46 @@ const Checkout = () => {
                     placeholder="ZIP Code *"
                     required
                   />
+                </div>
+                
+                {/* Payment Method */}
+                <div className="mt-6">
+                  <h3 className="text-lg font-semibold mb-4">Payment Method</h3>
+                  <div className="space-y-3">
+                    <label className="flex items-center">
+                      <input
+                        type="radio"
+                        name="paymentMethod"
+                        value="card"
+                        checked={formData.paymentMethod === 'card'}
+                        onChange={handleInputChange}
+                        className="mr-3"
+                      />
+                      <span>Credit/Debit Card</span>
+                    </label>
+                    <label className="flex items-center">
+                      <input
+                        type="radio"
+                        name="paymentMethod"
+                        value="paypal"
+                        checked={formData.paymentMethod === 'paypal'}
+                        onChange={handleInputChange}
+                        className="mr-3"
+                      />
+                      <span>PayPal</span>
+                    </label>
+                    <label className="flex items-center">
+                      <input
+                        type="radio"
+                        name="paymentMethod"
+                        value="cod"
+                        checked={formData.paymentMethod === 'cod'}
+                        onChange={handleInputChange}
+                        className="mr-3"
+                      />
+                      <span>Cash on Delivery</span>
+                    </label>
+                  </div>
                 </div>
               </div>
             </div>
