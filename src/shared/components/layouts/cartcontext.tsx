@@ -26,15 +26,34 @@ export const CartProvider: React.FC<{ children: React.ReactNode }> = ({
 
   // Get user cart name
   useEffect(() => {
-    const user = localStorage.getItem('user');
-    if (user) {
-      try {
-        const userData = JSON.parse(user);
-        setCartName(`${userData.username}_cart`);
-      } catch (error) {
-        console.error('Error parsing user data:', error);
+    const checkUser = () => {
+      const user = localStorage.getItem('user');
+      if (user && user !== 'undefined') {
+        try {
+          const userData = JSON.parse(user);
+          setCartName(`${userData.username}_cart`);
+        } catch (error) {
+          console.error('Error parsing user data:', error);
+        }
+      } else {
+        setCartName("");
       }
-    }
+    };
+
+    checkUser();
+    
+    // Listen for user updates
+    const handleUserUpdate = () => {
+      checkUser();
+    };
+
+    window.addEventListener('userUpdated', handleUserUpdate);
+    window.addEventListener('storage', handleUserUpdate);
+    
+    return () => {
+      window.removeEventListener('userUpdated', handleUserUpdate);
+      window.removeEventListener('storage', handleUserUpdate);
+    };
   }, []);
 
   // Add to cart mutation
@@ -54,9 +73,22 @@ export const CartProvider: React.FC<{ children: React.ReactNode }> = ({
   });
 
   const addToCart = (product: Product) => {
-    if (!cartName) {
+    const currentUser = localStorage.getItem('user');
+    if (!currentUser || currentUser === 'undefined') {
       alert('Please login to add items to cart');
       return;
+    }
+
+    let currentCartName = cartName;
+    if (!currentCartName) {
+      try {
+        const userData = JSON.parse(currentUser);
+        currentCartName = `${userData.username}_cart`;
+        setCartName(currentCartName);
+      } catch (error) {
+        alert('Please login to add items to cart');
+        return;
+      }
     }
 
     // Update local state immediately
@@ -74,7 +106,7 @@ export const CartProvider: React.FC<{ children: React.ReactNode }> = ({
 
     // Sync with backend
     addToCartMutation.mutate({
-      CartName: cartName,
+      CartName: currentCartName,
       ProductName: product.name,
       quantity: 1
     });
