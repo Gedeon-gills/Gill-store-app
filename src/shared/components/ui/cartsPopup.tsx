@@ -100,11 +100,11 @@ const CartDrawer = ({ isOpen, onClose }: CartDrawerProps) => {
               <div className="space-y-3 sm:space-y-4">
                 {cart.map((item: CartItem) => (
                   <div
-                    key={item.id}
+                    key={item._id}
                     className="flex gap-3 sm:gap-4 p-2.5 sm:p-3 border border-gray-200 rounded-lg hover:shadow-sm transition-shadow"
                   >
                     <img
-                      src={item.images[0]}
+                      src={item.Images?.[0] || 'https://via.placeholder.com/64x64'}
                       alt={item.name}
                       className="w-12 h-12 sm:w-16 sm:h-16 object-cover rounded-md flex-shrink-0"
                     />
@@ -117,7 +117,7 @@ const CartDrawer = ({ isOpen, onClose }: CartDrawerProps) => {
                       </p>
                       <div className="flex items-center gap-1.5 sm:gap-2">
                         <button
-                          onClick={() => decreaseQty(item.id)}
+                          onClick={() => decreaseQty(item._id)}
                           className="w-6 h-6 sm:w-8 sm:h-8 flex items-center justify-center border border-gray-300 rounded hover:bg-gray-50 text-xs sm:text-sm"
                         >
                           -
@@ -126,7 +126,7 @@ const CartDrawer = ({ isOpen, onClose }: CartDrawerProps) => {
                           {item.quantity}
                         </span>
                         <button
-                          onClick={() => increaseQty(item.id)}
+                          onClick={() => increaseQty(item._id)}
                           className="w-6 h-6 sm:w-8 sm:h-8 flex items-center justify-center border border-gray-300 rounded hover:bg-gray-50 text-xs sm:text-sm"
                         >
                           +
@@ -135,7 +135,7 @@ const CartDrawer = ({ isOpen, onClose }: CartDrawerProps) => {
                     </div>
                     <div className="flex flex-col items-end justify-between">
                       <button
-                        onClick={() => decreaseQty(item.id)}
+                        onClick={() => decreaseQty(item._id)}
                         className="text-gray-400 hover:text-red-500 p-0.5 sm:p-1"
                       >
                         <Trash2 size={14} className="sm:w-4 sm:h-4" />

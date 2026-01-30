@@ -1,12 +1,22 @@
 import { FaCartShopping, FaHeart, FaUser, FaMagnifyingGlass } from "react-icons/fa6";
 import { FaHome } from "react-icons/fa";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { useState, useEffect } from "react";
 import { useLocation } from "react-router-dom";
+import { useQueryClient } from "@tanstack/react-query";
+import CartDrawer from "../ui/cartsPopup";
+import LoginModal from "../ui/login";
+import PageLoader from "../ui/PageLoader";
 
 export default function StickyNavBar() {
   const location = useLocation();
+  const navigate = useNavigate();
+  const queryClient = useQueryClient();
   const [show, setShow] = useState(false);
+  const [user, setUser] = useState<any>(null);
+  const [isCartOpen, setIsCartOpen] = useState(false);
+  const [isLoginOpen, setIsLoginOpen] = useState(false);
+  const [loading, setLoading] = useState(false);
 
   useEffect(() => {
     let lastY = 0;
@@ -34,6 +44,57 @@ export default function StickyNavBar() {
     window.addEventListener("scroll", handleScroll);
     return () => window.removeEventListener("scroll", handleScroll);
   }, [location.pathname]);
+
+  useEffect(() => {
+    const storedUser = localStorage.getItem('user');
+    if (storedUser && storedUser !== 'undefined') {
+      try {
+        setUser(JSON.parse(storedUser));
+      } catch (error) {
+        console.error('Error parsing user data:', error);
+        localStorage.removeItem('user');
+      }
+    }
+
+    // Listen for user updates
+    const handleUserUpdate = () => {
+      const updatedUser = localStorage.getItem('user');
+      if (updatedUser && updatedUser !== 'undefined') {
+        try {
+          setUser(JSON.parse(updatedUser));
+        } catch (error) {
+          console.error('Error parsing updated user data:', error);
+        }
+      }
+    };
+
+    window.addEventListener('userUpdated', handleUserUpdate);
+    return () => window.removeEventListener('userUpdated', handleUserUpdate);
+  }, []);
+
+  const handleLoginSuccess = () => {
+    const storedUser = localStorage.getItem('user');
+    if (storedUser && storedUser !== 'undefined') {
+      try {
+        setUser(JSON.parse(storedUser));
+      } catch (error) {
+        console.error('Error parsing user data:', error);
+        localStorage.removeItem('user');
+      }
+    }
+  };
+
+  const handleProfileClick = () => {
+    if (user) {
+      setLoading(true);
+      setTimeout(() => {
+        navigate('/profile');
+        setLoading(false);
+      }, 500);
+    } else {
+      setIsLoginOpen(true);
+    }
+  };
 
   return (
     <nav
@@ -90,20 +151,47 @@ export default function StickyNavBar() {
 
         {/* Actions */}
         <ul className="nav-sticky-actions flex gap-2 sm:gap-4 text-white text-xs sm:text-sm">
-          <li className="flex items-center gap-1 cursor-pointer hover:text-gray-200 transition-colors">
-            <FaUser className="text-xs sm:text-sm" />
-            <span className="hidden sm:inline">Account</span>
+          <li 
+            onClick={handleProfileClick}
+            className="flex items-center gap-1 cursor-pointer hover:text-gray-200 transition-colors"
+          >
+            {user ? (
+              <>
+                {user?.profile ? (
+                  <img 
+                    src={user.profile} 
+                    alt={user.username}
+                    className="w-4 h-4 sm:w-5 sm:h-5 rounded-full object-cover"
+                  />
+                ) : (
+                  <FaUser className="text-xs sm:text-sm" />
+                )}
+                <span className="hidden sm:inline">{user.username}</span>
+              </>
+            ) : (
+              <>
+                <FaUser className="text-xs sm:text-sm" />
+                <span className="hidden sm:inline">Account</span>
+              </>
+            )}
           </li>
           <li className="flex items-center gap-1 cursor-pointer hover:text-gray-200 transition-colors">
             <FaHeart className="text-xs sm:text-sm" /> 
             <Link to={"/Favourites"} className="hidden sm:inline">FAVS</Link>
           </li>
-          <li className="flex items-center gap-1 cursor-pointer hover:text-gray-200 transition-colors">
+          <li 
+            onClick={() => setIsCartOpen(true)}
+            className="flex items-center gap-1 cursor-pointer hover:text-gray-200 transition-colors"
+          >
             <FaCartShopping className="text-xs sm:text-sm" />
             <span className="hidden sm:inline">Carts</span>
           </li>
         </ul>
       </div>
+      
+      {loading && <PageLoader />}
+      <CartDrawer isOpen={isCartOpen} onClose={() => setIsCartOpen(false)} />
+      <LoginModal isOpen={isLoginOpen} onClose={() => setIsLoginOpen(false)} onLoginSuccess={handleLoginSuccess} />
     </nav>
   );
 }

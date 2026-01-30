@@ -12,6 +12,7 @@ import Shop from "./shared/components/pages/shop";
 import ProductPage from "./shared/components/pages/prodWeb";
 import CategoriesWeb from "./shared/components/pages/categoryWeb";
 import Checkout from "./shared/components/layouts/checkout";
+import Profile from "./shared/components/pages/Profile";
 export default function App() {
   return (
     <CartProvider>
@@ -28,6 +29,7 @@ export default function App() {
             <Route path="/FAQ" element={<FAQ />} />
             <Route path="/Favourites" element={<Favourites />} />
             <Route path="/Shop" element={<Shop />} />
+            <Route path="/profile" element={<Profile />} />
             <Route path="/checkout" element={<Checkout />} />
           </Routes>
         </BrowserRouter>

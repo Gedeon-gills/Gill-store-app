@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import { X, Eye, EyeOff } from "lucide-react";
+import { FaUser } from "react-icons/fa";
 import { useMutation } from "@tanstack/react-query";
 import { userService } from "../../services/userService";
 
@@ -37,6 +38,9 @@ const RegisterModal: React.FC<LoginModalProps> = ({ isOpen, onClose }) => {
     password: "",
     rememberMe: false,
   });
+  const [userIntent, setUserIntent] = useState<"customer" | "vendor" | null>(null);
+  const [profileImage, setProfileImage] = useState<string>("");
+  const [skipProfile, setSkipProfile] = useState(false);
 
   const [errors, setErrors] = useState<{ [key: string]: string }>({});
 
@@ -89,7 +93,8 @@ const RegisterModal: React.FC<LoginModalProps> = ({ isOpen, onClose }) => {
       email: formData.email,
       password: formData.password,
       phone: formData.phone,
-      UserType: "customer" as "admin"|"vendor"|"customer"
+      UserType: userIntent || "customer",
+      profile: skipProfile ? undefined : profileImage || undefined
     });
 
     // navigate("/"); // Redirect after success
@@ -171,6 +176,78 @@ const RegisterModal: React.FC<LoginModalProps> = ({ isOpen, onClose }) => {
                 {errors.phone && (
                   <p className="text-red-500 text-xs mt-1">{errors.phone}</p>
                 )}
+              </div>
+            )}
+
+            {/* Profile Image Upload */}
+            {!isRegisterView && !skipProfile && (
+              <div className="space-y-3">
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Profile Picture (Optional)
+                </label>
+                <div className="flex items-center gap-4">
+                  <div className="w-16 h-16 rounded-full bg-gray-200 flex items-center justify-center overflow-hidden">
+                    {profileImage ? (
+                      <img src={profileImage} alt="Profile" className="w-full h-full object-cover" />
+                    ) : (
+                      <FaUser className="text-gray-400 text-xl" />
+                    )}
+                  </div>
+                  <div className="flex-1">
+                    <input
+                      type="url"
+                      placeholder="Enter image URL"
+                      value={profileImage}
+                      onChange={(e) => setProfileImage(e.target.value)}
+                      className="w-full py-2 px-3 border border-gray-300 rounded-lg text-sm focus:outline-none focus:border-blue-600"
+                    />
+                  </div>
+                </div>
+                <div className="flex items-center gap-2">
+                  <input
+                    type="checkbox"
+                    id="skipProfile"
+                    checked={skipProfile}
+                    onChange={(e) => setSkipProfile(e.target.checked)}
+                    className="accent-blue-600"
+                  />
+                  <label htmlFor="skipProfile" className="text-sm text-gray-600">
+                    Skip for now, I'll add it later
+                  </label>
+                </div>
+              </div>
+            )}
+
+            {/* User Intent Selection */}
+            {!isRegisterView && (
+              <div className="space-y-3">
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  What do you want to do?
+                </label>
+                <div className="grid grid-cols-2 gap-3">
+                  <button
+                    type="button"
+                    onClick={() => setUserIntent("customer")}
+                    className={`p-3 border rounded-lg text-sm font-medium transition-colors ${
+                      userIntent === "customer"
+                        ? "border-blue-600 bg-blue-50 text-blue-600"
+                        : "border-gray-300 hover:border-gray-400"
+                    }`}
+                  >
+                    Purchase Products
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setUserIntent("vendor")}
+                    className={`p-3 border rounded-lg text-sm font-medium transition-colors ${
+                      userIntent === "vendor"
+                        ? "border-blue-600 bg-blue-50 text-blue-600"
+                        : "border-gray-300 hover:border-gray-400"
+                    }`}
+                  >
+                    Sell Products
+                  </button>
+                </div>
               </div>
             )}
 

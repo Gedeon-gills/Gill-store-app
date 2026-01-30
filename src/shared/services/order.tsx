@@ -1,48 +1,35 @@
 // services/OrderService.ts
 import api from "./ApiSetter";
-export interface OrderServ {
-  id: string;
+
+export interface Order {
+  _id: string;
   orderId: string;
   cartName: string;
   totalAmount: number;
-  timeOrderPlaced: Date;
+  timeOrderPlaced: string;
 }
+
 export const OrderService = {
-  // GET all Orders
-  getOrders: async (params?: { search?: string; role?: string }):
- Promise<OrderServ[]>  => {
-    const response = await api.get("/orders", { params });
+  // POST create Order from cart
+  createOrder: async (orderData: {
+    cartName: string;
+  }): Promise<{ message: string; order: Order }> => {
+    const response = await api.post("/orders", orderData);
     return response.data;
   },
 
-  // GET single Order
-  getOrder: async (id: string):
- Promise<OrderServ> => {
-    const response = await api.get(`/orders/${id}`);
-    return response.data;
-  },
-
-  // POST create Order
-  createOrder: async (OrderData: {
-    orderId: string;
+  // PUT update Order
+  updateOrder: async (orderId: string, orderData: Partial<{
     cartName: string;
     totalAmount: number;
-    timeOrderPlaced: Date;
-  }) => {
-    const response = await api.post("/orders", OrderData);
-    return response.data;
-  },
-  updateOrder: async (
-    id: string,
-    OrderData: Partial<{ name: string; email: string; role: string }>,
-  ):
- Promise<OrderServ> => {
-    const response = await api.put(`/orders/${id}`, OrderData);
+  }>): Promise<{ message: string; order: Order }> => {
+    const response = await api.put(`/orders/${orderId}`, orderData);
     return response.data;
   },
 
-  deleteOrder: async (id: string) => {
-    const response = await api.delete(`/orders/${id}`);
+  // DELETE Order
+  deleteOrder: async (orderId: string): Promise<{ message: string }> => {
+    const response = await api.delete(`/orders/${orderId}`);
     return response.data;
   },
 };

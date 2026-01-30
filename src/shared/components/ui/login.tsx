@@ -1,14 +1,16 @@
 import React, { useState } from "react";
 import { X, Eye, EyeOff } from "lucide-react";
+import { FaUser } from "react-icons/fa";
 import { useNavigate } from "react-router-dom";
 import { userService } from "../../services/userService";
 
 interface LoginModalProps {
   isOpen: boolean;
   onClose: () => void;
+  onLoginSuccess?: () => void;
 }
 
-const LoginModal: React.FC<LoginModalProps> = ({ isOpen, onClose }) => {
+const LoginModal: React.FC<LoginModalProps> = ({ isOpen, onClose, onLoginSuccess }) => {
   const navigate = useNavigate();
   const [isLoginView, setIsLoginView] = useState(true);
   const [showPassword, setShowPassword] = useState(false);
@@ -24,6 +26,20 @@ const LoginModal: React.FC<LoginModalProps> = ({ isOpen, onClose }) => {
     password: "",
     UserType: "customer" as "admin"|"vendor"|"customer"
   });
+  const [userIntent, setUserIntent] = useState<"customer" | "vendor" | null>(null);
+  const [profileImage, setProfileImage] = useState<string>("");
+  const [skipProfile, setSkipProfile] = useState(false);
+
+  const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      const reader = new FileReader();
+      reader.onload = (event) => {
+        setProfileImage(event.target?.result as string);
+      };
+      reader.readAsDataURL(file);
+    }
+  };
 
   if (!isOpen) return null;
 
@@ -37,18 +53,40 @@ const LoginModal: React.FC<LoginModalProps> = ({ isOpen, onClose }) => {
         const response = await userService.LoginUser(loginData);
         localStorage.setItem('token', response.token);
         localStorage.setItem('user', JSON.stringify(response.user));
+        onLoginSuccess?.(); // Notify parent component
         onClose();
         navigate('/');
       } else {
         console.log('Sending registration data:', registerData);
-        await userService.createUser(registerData);
+        const response = await userService.createUser({
+          ...registerData,
+          UserType: userIntent || "customer",
+          profile: skipProfile ? undefined : profileImage || undefined
+        });
+        // If registration returns user data, store it
+        if (response.user) {
+          localStorage.setItem('user', JSON.stringify(response.user));
+          onLoginSuccess?.(); // Update navbar
+        }
         setIsLoginView(true);
         setError('Account created successfully! Please login.');
       }
     } catch (err: any) {
       console.error('Full error:', err);
       console.error('Error response:', err.response);
-      setError(err.response?.data?.message || err.message || 'Authentication failed');
+      
+      // Handle different error scenarios with user-friendly messages
+      if (err.response?.status === 401) {
+        setError('Invalid email or password. Please try again.');
+      } else if (err.response?.status === 404) {
+        setError('Account not found. Please check your email or create an account.');
+      } else if (err.response?.status === 500) {
+        setError('Server error. Please try again later.');
+      } else if (err.message === 'Network Error') {
+        setError('Network error. Please check your connection.');
+      } else {
+        setError('Invalid email or password. Please try again.');
+      }
     } finally {
       setLoading(false);
     }
@@ -127,6 +165,75 @@ const LoginModal: React.FC<LoginModalProps> = ({ isOpen, onClose }) => {
                     onChange={(e) => setRegisterData({...registerData, phone: e.target.value})}
                     className="w-full py-3 outline-none focus:border-blue-600 text-sm sm:text-base"
                   />
+                </div>
+
+                {/* Profile Image Upload */}
+                {!skipProfile && (
+                  <div className="space-y-3">
+                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                      Profile Picture (Optional)
+                    </label>
+                    <div className="flex items-center gap-4">
+                      <div className="w-16 h-16 rounded-full bg-gray-200 flex items-center justify-center overflow-hidden">
+                        {profileImage ? (
+                          <img src={profileImage} alt="Profile" className="w-full h-full object-cover" />
+                        ) : (
+                          <FaUser className="text-gray-400 text-xl" />
+                        )}
+                      </div>
+                      <div className="flex-1">
+                        <input
+                          type="file"
+                          accept="image/*"
+                          onChange={handleImageUpload}
+                          className="w-full py-2 px-3 border border-gray-300 rounded-lg text-sm focus:outline-none focus:border-blue-600 file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-sm file:bg-blue-50 file:text-blue-600 hover:file:bg-blue-100"
+                        />
+                      </div>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <input
+                        type="checkbox"
+                        id="skipProfile"
+                        checked={skipProfile}
+                        onChange={(e) => setSkipProfile(e.target.checked)}
+                        className="accent-blue-600"
+                      />
+                      <label htmlFor="skipProfile" className="text-sm text-gray-600">
+                        Skip for now, I'll add it later
+                      </label>
+                    </div>
+                  </div>
+                )}
+
+                {/* User Intent Selection */}
+                <div className="space-y-3">
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    What do you want to do?
+                  </label>
+                  <div className="grid grid-cols-2 gap-3">
+                    <button
+                      type="button"
+                      onClick={() => setUserIntent("customer")}
+                      className={`p-3 border rounded-lg text-sm font-medium transition-colors ${
+                        userIntent === "customer"
+                          ? "border-blue-600 bg-blue-50 text-blue-600"
+                          : "border-gray-300 hover:border-gray-400"
+                      }`}
+                    >
+                      Purchase Products
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => setUserIntent("vendor")}
+                      className={`p-3 border rounded-lg text-sm font-medium transition-colors ${
+                        userIntent === "vendor"
+                          ? "border-blue-600 bg-blue-50 text-blue-600"
+                          : "border-gray-300 hover:border-gray-400"
+                      }`}
+                    >
+                      Sell Products
+                    </button>
+                  </div>
                 </div>
               </>
             )}

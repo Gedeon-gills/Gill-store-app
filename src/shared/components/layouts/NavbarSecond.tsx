@@ -1,27 +1,74 @@
 import { FaSearch, FaShoppingBag, FaUser, FaHeart, FaBlog } from "react-icons/fa";
 import { Link, useNavigate } from "react-router-dom";
 import CartDrawer from "../ui/cartsPopup";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import LoginModal from "../ui/login";
 import RegisterModal from "../ui/register";
 import { useQueryClient, type QueryClient } from "@tanstack/react-query";
+import PageLoader from "../ui/PageLoader";
+
 export default function SecondNavBar() {
   const [isCartOpen, setIsCartOpen] = useState(false);
   const [isLoginOpen, setIsLoginOpen] = useState(false);
   const [isRegisterOpen, setIsRegisterOpen] = useState(false);
   const [isAccount, setIsAccount] = useState(false);
+  const [user, setUser] = useState<any>(null);
+  const [loading, setLoading] = useState(false);
+  
   const openLogin = () => setIsLoginOpen(true);
   const closeRegister = () => setIsRegisterOpen(false);
   const closeLogin = () => setIsLoginOpen(false);
   const openCart = () => setIsCartOpen(true);
   const closeCart = () => setIsCartOpen(false);
+  
   const logout = (queryClient: QueryClient) => {
     localStorage.removeItem("token");
+    localStorage.removeItem("user");
+    setUser(null);
     queryClient.clear();
   };
 
   const navigate = useNavigate();
   const queryClient = useQueryClient();
+
+  useEffect(() => {
+    const storedUser = localStorage.getItem('user');
+    if (storedUser && storedUser !== 'undefined') {
+      try {
+        setUser(JSON.parse(storedUser));
+      } catch (error) {
+        console.error('Error parsing user data:', error);
+        localStorage.removeItem('user');
+      }
+    }
+
+    // Listen for user updates
+    const handleUserUpdate = () => {
+      const updatedUser = localStorage.getItem('user');
+      if (updatedUser && updatedUser !== 'undefined') {
+        try {
+          setUser(JSON.parse(updatedUser));
+        } catch (error) {
+          console.error('Error parsing updated user data:', error);
+        }
+      }
+    };
+
+    window.addEventListener('userUpdated', handleUserUpdate);
+    return () => window.removeEventListener('userUpdated', handleUserUpdate);
+  }, []);
+
+  const handleLoginSuccess = () => {
+    const storedUser = localStorage.getItem('user');
+    if (storedUser && storedUser !== 'undefined') {
+      try {
+        setUser(JSON.parse(storedUser));
+      } catch (error) {
+        console.error('Error parsing user data:', error);
+        localStorage.removeItem('user');
+      }
+    }
+  };
 
   function handleLogout() {
     logout(queryClient);
@@ -83,40 +130,48 @@ export default function SecondNavBar() {
           </li>
           
           <li
-            onMouseEnter={() => setIsAccount(true)}
             className="relative text-white text-xs sm:text-sm font-medium cursor-pointer p-2 sm:p-1 rounded-lg sm:rounded-none hover:bg-blue-700 sm:hover:bg-transparent transition-colors"
           >
             {/* Account button */}
-            <div className="flex items-center gap-1 hover:opacity-80">
-              <FaUser className="text-lg sm:text-sm" />
-              <span className="hidden sm:inline">ACCOUNT</span>
-            </div>
-
-            {/* Dropdown */}
-            {isAccount && (
-              <ul
-                onMouseLeave={() => setIsAccount(false)}
-                className="absolute top-full right-0 sm:left-0 mt-2 w-32 sm:w-40 bg-white text-black shadow-lg rounded-md overflow-hidden z-50"
+            {user ? (
+              <div 
+                onClick={() => {
+                  setLoading(true);
+                  setTimeout(() => {
+                    navigate('/profile');
+                    setLoading(false);
+                  }, 500);
+                }}
+                className="flex items-center gap-2 hover:opacity-80"
               >
-                <li
-                  onClick={openLogin}
-                  className="px-3 sm:px-4 py-2 hover:bg-gray-100 cursor-pointer text-xs sm:text-sm"
-                >
-                  ACCOUNT
-                </li>
-                <li
-                  onClick={handleLogout}
-                  className="px-3 sm:px-4 py-2 hover:bg-red-400 cursor-pointer text-xs sm:text-sm"
-                >
-                  LOG OUT
-                </li>
-              </ul>
+                {user?.profile ? (
+                  <img 
+                    src={user.profile} 
+                    alt={user.username}
+                    className="w-6 h-6 sm:w-8 sm:h-8 rounded-full object-cover"
+                  />
+                ) : (
+                  <FaUser className="text-lg sm:text-sm" />
+                )}
+                <span className="hidden sm:inline">
+                  {user.username}
+                </span>
+              </div>
+            ) : (
+              <div 
+                onClick={openLogin}
+                className="flex items-center gap-2 hover:opacity-80"
+              >
+                <FaUser className="text-lg sm:text-sm" />
+                <span className="hidden sm:inline">SIGN IN</span>
+              </div>
             )}
           </li>
         </div>
       </ul>
+      {loading && <PageLoader />}
       <CartDrawer isOpen={isCartOpen} onClose={closeCart} />
-      <LoginModal isOpen={isLoginOpen} onClose={closeLogin} />
+      <LoginModal isOpen={isLoginOpen} onClose={closeLogin} onLoginSuccess={handleLoginSuccess} />
       <RegisterModal isOpen={isRegisterOpen} onClose={closeRegister} />
     </nav>
   );

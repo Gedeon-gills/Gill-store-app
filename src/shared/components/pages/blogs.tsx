@@ -59,24 +59,6 @@ const blogPosts = [
     description: "Timeless pieces for every occasion",
     owner: "Watch Expert",
     date: "Dec 3, 2024"
-  },
-  {
-    id: "7",
-    name: "Summer Dress Collection",
-    images: ["https://i.pinimg.com/1200x/d6/e4/bb/d6e4bba33d2b6a56d6f2c1ce8c256dfb.jpg"],
-    category: "Dresses",
-    description: "Light and breezy options for warm weather",
-    owner: "Dress Designer",
-    date: "Dec 1, 2024"
-  },
-  {
-    id: "8",
-    name: "Streetwear Revolution",
-    images: ["https://i.pinimg.com/1200x/5a/1b/94/5a1b94a84eaf2dda6fd7406d24f1a79b.jpg"],
-    category: "Streetwear",
-    description: "How streetwear is changing fashion",
-    owner: "Street Style",
-    date: "Nov 28, 2024"
   }
 ];
 
@@ -85,6 +67,12 @@ export default function Blogs() {
   const [showArchives, setShowArchives] = useState(true);
   const [showCategories, setShowCategories] = useState(true);
   const [showTags, setShowTags] = useState(true);
+  const [searchTerm, setSearchTerm] = useState("");
+
+  const filteredBlogs = blogPosts.filter(blog => 
+    blog.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    blog.category.toLowerCase().includes(searchTerm.toLowerCase())
+  );
 
   return (
     <div>
@@ -103,7 +91,7 @@ export default function Blogs() {
         <div className="max-w-7xl mx-auto px-6 py-14 grid grid-cols-1 lg:grid-cols-4 gap-12">
           {/* Blog Cards */}
           <main className="lg:col-span-3 grid grid-cols-1 md:grid-cols-2 gap-10">
-            {blogPosts.slice(0, 8).map((post, i) => (
+            {filteredBlogs.slice(0, 8).map((post, i) => (
               <BlogsProductCard
                 key={i}
                 image={post.images[0]}
@@ -124,6 +112,8 @@ export default function Blogs() {
                 <input
                   type="text"
                   placeholder="Search..."
+                  value={searchTerm}
+                  onChange={(e) => setSearchTerm(e.target.value)}
                   className="w-full px-4 py-2 text-sm focus:outline-none bg-white"
                 />
                 <button className="bg-black text-white px-4 flex items-center justify-center">
