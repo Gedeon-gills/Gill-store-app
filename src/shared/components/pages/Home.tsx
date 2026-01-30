@@ -7,6 +7,8 @@ import Divisions from "../layouts/divisions";
 import DivStarter from "../ui/DivStarter";
 import Products from "../ui/products";
 import ContentWrapper from "../ui/contentLapup";
+import { HomeDashboard } from "../ui/HomeDashboard";
+
 export default function Home() {
   return (
     <div>
@@ -14,6 +16,9 @@ export default function Home() {
       <ContentWrapper>
         <FirstDivision />
         <Categories />
+
+        {/* DASHBOARD SECTION - Only visible for admin users */}
+        <HomeDashboard />
 
         {/* FEATURED PRODUCTS */}
         <DivStarter description="FEATURED PRODUCTS" />

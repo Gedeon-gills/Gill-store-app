@@ -1,4 +1,5 @@
 import { FaDollarSign, FaShoppingCart, FaUsers, FaArrowUp, FaArrowDown } from 'react-icons/fa';
+import { SimpleLineChart } from './SimpleLineChart';
 
 export const RevenueCard = () => {
   const stats = [
@@ -28,6 +29,11 @@ export const RevenueCard = () => {
     }
   ];
 
+  const chartData = {
+    labels: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'],
+    data: [12000, 19000, 15000, 25000, 22000, 30000, 28000]
+  };
+
   return (
     <div className="bg-white rounded-3xl p-6 shadow-sm border border-slate-100">
       <div className="flex items-center justify-between mb-6">
@@ -39,7 +45,7 @@ export const RevenueCard = () => {
         </select>
       </div>
 
-      <div className="grid grid-cols-3 gap-6">
+      <div className="grid grid-cols-3 gap-6 mb-6">
         {stats.map((stat, index) => (
           <div key={index} className="text-center">
             <div className={`inline-flex p-3 rounded-2xl ${stat.color} mb-3`}>
@@ -59,9 +65,10 @@ export const RevenueCard = () => {
         ))}
       </div>
 
-      {/* Chart placeholder */}
-      <div className="mt-6 h-32 bg-gradient-to-r from-purple-50 to-blue-50 rounded-2xl flex items-center justify-center">
-        <p className="text-slate-400 text-sm">Revenue Chart (Chart.js integration)</p>
+      {/* Revenue Chart */}
+      <div className="bg-gradient-to-r from-purple-50 to-blue-50 rounded-2xl p-4">
+        <h4 className="text-sm font-medium text-slate-700 mb-3">Weekly Revenue Trend</h4>
+        <SimpleLineChart data={chartData} color="#8b5cf6" height={100} />
       </div>
     </div>
   );
