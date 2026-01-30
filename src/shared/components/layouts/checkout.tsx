@@ -89,7 +89,7 @@ const Checkout = () => {
               <h2 className="text-xl font-semibold mb-4">Order Summary</h2>
               <div className="space-y-2 text-left">
                 {cart.map((item: CartItem) => (
-                  <div key={item._id} className="flex justify-between">
+                  <div key={item.id} className="flex justify-between">
                     <span>{item.name} × {item.quantity}</span>
                     <span>${(item.price * item.quantity).toFixed(2)}</span>
                   </div>
@@ -218,7 +218,7 @@ const Checkout = () => {
                     <span>Subtotal</span>
                   </div>
                   {cart.map((item: CartItem) => (
-                    <div key={item._id} className="flex justify-between text-sm">
+                    <div key={item.id} className="flex justify-between text-sm">
                       <span>{item.name} × {item.quantity}</span>
                       <span className="font-medium">
                         ${(item.price * item.quantity).toFixed(2)}

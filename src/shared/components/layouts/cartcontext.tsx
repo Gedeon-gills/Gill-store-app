@@ -1,5 +1,5 @@
 import React, { createContext, useContext, useState, useEffect } from "react";
-import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { cartService } from "../../services/cartService";
 import type { Product } from "../../store/products";
 
@@ -61,10 +61,10 @@ export const CartProvider: React.FC<{ children: React.ReactNode }> = ({
 
     // Update local state immediately
     setCart((prev) => {
-      const existing = prev.find((item) => item._id === product._id);
+      const existing = prev.find((item) => item.id === product.id);
       if (existing) {
         return prev.map((item) =>
-          item._id === product._id
+          item.id === product.id
             ? { ...item, quantity: item.quantity + 1 }
             : item,
         );
@@ -81,11 +81,11 @@ export const CartProvider: React.FC<{ children: React.ReactNode }> = ({
   };
 
   const increaseQty = (id: string) => {
-    const item = cart.find(item => item._id === id);
+    const item = cart.find(item => item.id === id);
     if (item && cartName) {
       setCart((prev) =>
         prev.map((item) =>
-          item._id === id ? { ...item, quantity: item.quantity + 1 } : item,
+          item.id === id ? { ...item, quantity: item.quantity + 1 } : item,
         ),
       );
       
@@ -98,11 +98,11 @@ export const CartProvider: React.FC<{ children: React.ReactNode }> = ({
   };
 
   const decreaseQty = (id: string) => {
-    const item = cart.find(item => item._id === id);
+    const item = cart.find(item => item.id === id);
     if (item && cartName) {
       if (item.quantity === 1) {
         // Remove from cart
-        setCart((prev) => prev.filter((item) => item._id !== id));
+        setCart((prev) => prev.filter((item) => item.id !== id));
         removeFromCartMutation.mutate({
           CartName: cartName,
           ProductName: item.name
@@ -111,7 +111,7 @@ export const CartProvider: React.FC<{ children: React.ReactNode }> = ({
         // Decrease quantity
         setCart((prev) =>
           prev.map((item) =>
-            item._id === id ? { ...item, quantity: item.quantity - 1 } : item,
+            item.id === id ? { ...item, quantity: item.quantity - 1 } : item,
           ),
         );
       }

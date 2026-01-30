@@ -3,7 +3,6 @@ import { FaHome } from "react-icons/fa";
 import { Link, useNavigate } from "react-router-dom";
 import { useState, useEffect } from "react";
 import { useLocation } from "react-router-dom";
-import { useQueryClient } from "@tanstack/react-query";
 import CartDrawer from "../ui/cartsPopup";
 import LoginModal from "../ui/login";
 import PageLoader from "../ui/PageLoader";
@@ -11,7 +10,6 @@ import PageLoader from "../ui/PageLoader";
 export default function StickyNavBar() {
   const location = useLocation();
   const navigate = useNavigate();
-  const queryClient = useQueryClient();
   const [show, setShow] = useState(false);
   const [user, setUser] = useState<any>(null);
   const [isCartOpen, setIsCartOpen] = useState(false);

@@ -4,14 +4,12 @@ import CartDrawer from "../ui/cartsPopup";
 import { useState, useEffect } from "react";
 import LoginModal from "../ui/login";
 import RegisterModal from "../ui/register";
-import { useQueryClient, type QueryClient } from "@tanstack/react-query";
 import PageLoader from "../ui/PageLoader";
 
 export default function SecondNavBar() {
   const [isCartOpen, setIsCartOpen] = useState(false);
   const [isLoginOpen, setIsLoginOpen] = useState(false);
   const [isRegisterOpen, setIsRegisterOpen] = useState(false);
-  const [isAccount, setIsAccount] = useState(false);
   const [user, setUser] = useState<any>(null);
   const [loading, setLoading] = useState(false);
   
@@ -20,16 +18,8 @@ export default function SecondNavBar() {
   const closeLogin = () => setIsLoginOpen(false);
   const openCart = () => setIsCartOpen(true);
   const closeCart = () => setIsCartOpen(false);
-  
-  const logout = (queryClient: QueryClient) => {
-    localStorage.removeItem("token");
-    localStorage.removeItem("user");
-    setUser(null);
-    queryClient.clear();
-  };
 
   const navigate = useNavigate();
-  const queryClient = useQueryClient();
 
   useEffect(() => {
     const storedUser = localStorage.getItem('user');
@@ -69,11 +59,6 @@ export default function SecondNavBar() {
       }
     }
   };
-
-  function handleLogout() {
-    logout(queryClient);
-    navigate("/shop");
-  }
   return (
     <nav className="bg-blue-600 py-2 sm:py-4 h-auto justify-baseline">
       <ul className="max-w-7xl mx-auto px-2 sm:px-4 flex flex-col sm:flex-row items-center justify-between gap-3 sm:gap-6 mt-4 sm:mt-10">

@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef } from "react";
 import { useNavigate } from "react-router-dom";
-import { FaUser, FaSignOutAlt, FaEdit, FaTrash } from "react-icons/fa";
+import { FaUser, FaEdit } from "react-icons/fa";
 import { useQueryClient, useQuery, useMutation } from "@tanstack/react-query";
 import { userService } from "../../services/userService";
 import Header from "../forms/Headers";
@@ -44,7 +44,7 @@ export default function Profile() {
   const updateProfileMutation = useMutation({
     mutationFn: userService.updateProfile,
     onSuccess: (data) => {
-      const updatedUser = { ...localUser, ...data.user };
+      const updatedUser = { ...localUser, ...data };
       setLocalUser(updatedUser);
       localStorage.setItem('user', JSON.stringify(updatedUser));
       window.dispatchEvent(new Event('userUpdated'));
