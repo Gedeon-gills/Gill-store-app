@@ -3,6 +3,7 @@ import { CartProvider } from "./shared/components/layouts/cartcontext";
 import { WishlistProvider } from "./shared/components/layouts/wishlistcontext";
 import Home from "./shared/components/pages/Home";
 import Blogs from "./shared/components/pages/blogs";
+import About from "./shared/components/pages/about";
 import Carts from "./shared/components/pages/cartsDiv";
 import Elements from "./shared/components/pages/elements";
 import ContactUs from "./shared/components/pages/contactUs";
@@ -13,14 +14,17 @@ import ProductPage from "./shared/components/pages/prodWeb";
 import CategoriesWeb from "./shared/components/pages/categoryWeb";
 import Checkout from "./shared/components/layouts/checkout";
 import Profile from "./shared/components/pages/Profile";
-import ModernDashboard from "./pages/ModernDashboard";
-import Orders from "./pages/Orders";
-import Products from "./pages/Products";
-import Customers from "./pages/Customers";
-import Campaign from "./pages/Campaign";
-import AddCampaign from "./pages/AddCampaign";
-import Analytics from "./pages/Analytics";
+import Orders from "./admin/Orders";
+import Products from "./admin/Products";
+import Customers from "./admin/Customers";
+import Analytics from "./admin/Analytics";
+import { AdminLayout } from './admin/adminLayout';
+import { Dashboard } from './admin/dashboard';
+
+
+
 export default function App() {
+  
   return (
     <CartProvider>
       <WishlistProvider>
@@ -28,6 +32,7 @@ export default function App() {
           <Routes>
             <Route path="/" element={<Home />} />
             <Route path="/blogs" element={<Blogs />} />
+            <Route path="/pages" element={<About />} />
             <Route path="/product/:id" element={<ProductPage />} />
             <Route path="/Carts" element={<Carts />} />
             <Route path="/Elements" element={<Elements />} />
@@ -38,13 +43,16 @@ export default function App() {
             <Route path="/Shop" element={<Shop />} />
             <Route path="/profile" element={<Profile />} />
             <Route path="/checkout" element={<Checkout />} />
-            <Route path="/admin/dashboard" element={<ModernDashboard />} />
-            <Route path="/admin/orders" element={<Orders />} />
-            <Route path="/admin/products" element={<Products />} />
-            <Route path="/admin/customers" element={<Customers />} />
-            <Route path="/admin/campaign" element={<Campaign />} />
-            <Route path="/admin/campaign/add" element={<AddCampaign />} />
-            <Route path="/admin/analytics" element={<Analytics />} />
+
+
+            {/* Admin Dashboard Routes */}
+          <Route path="/admin" element={<AdminLayout />}>
+            <Route index element={<Dashboard />} />
+            <Route path="products" element={<Products />} />
+            <Route path="orders" element={<Orders />} />
+            <Route path="customers" element={<Customers />} />
+            <Route path="settings" element={<Analytics />} />
+          </Route>
           </Routes>
         </BrowserRouter>
       </WishlistProvider>

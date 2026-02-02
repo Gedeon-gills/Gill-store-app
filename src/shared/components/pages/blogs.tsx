@@ -1,68 +1,85 @@
 import { useState } from "react";
+import { Link, useParams } from "react-router-dom";
 import { FaSearchengin } from "react-icons/fa6";
 import BlogsProductCard from "../layouts/BlogProduct";
 import Header from "../forms/Headers";
 import Footer from "../forms/Footer";
 
+
+
 // Mock blog data
 const blogPosts = [
   {
-    id: "1",
-    name: "Latest Fashion Trends 2024",
-    images: ["https://i.pinimg.com/1200x/9d/be/6a/9dbe6a288dd99d451fd5b3a2fd5881cf.jpg"],
-    category: "Fashion",
-    description: "Discover the hottest fashion trends for this season",
-    owner: "Fashion Editor",
-    date: "Dec 15, 2024"
+    id: 1,
+    name: "Do you Have A Passion for Photography",
+    category: "BEAUTY, LIFESTYLE",
+    owner: "Martin Gray",
+    date: "May 31, 2019",
+    description:
+      "Sed velit mattis ipsum mi, quam turpis porttitor duis, ipsum fusce congue at, etiam sit nec erat...",
+    images:
+      ["https://images.unsplash.com/photo-1542038784456-1ea8e935640e?auto=format&fit=crop&q=80&w=600"],
   },
   {
-    id: "2",
-    name: "Men's Style Guide",
-    images: ["https://i.pinimg.com/1200x/93/2b/98/932b986e54a77be6ec5813b95e5454c3.jpg"],
-    category: "Men's Fashion",
-    description: "Essential style tips for the modern gentleman",
-    owner: "Style Expert",
-    date: "Dec 12, 2024"
+    id: 2,
+    name: "Notify What Makes You Happy, Smile More!",
+    category: "LIFESTYLE, TRAVEL",
+    owner: "Martin Gray",
+    date: "May 30, 2019",
+    description:
+      "Sed velit mattis ipsum mi, quam turpis porttitor duis, ipsum fusce congue at, etiam sit nec erat...",
+    images:
+      ["https://images.unsplash.com/photo-1494790108377-be9c29b29330?auto=format&fit=crop&q=80&w=600"],
   },
   {
-    id: "3",
-    name: "Seasonal Accessories",
-    images: ["https://i.pinimg.com/1200x/d2/5c/26/d25c265c63c07a3ae081c1dc51cff9d3.jpg"],
-    category: "Accessories",
-    description: "Must-have accessories for every season",
-    owner: "Accessories Team",
-    date: "Dec 10, 2024"
+    id: 3,
+    name: "Do you Have A Passion for Photography",
+    category: "BEAUTY, LIFESTYLE",
+    owner: "Martin Gray",
+    date: "May 31, 2019",
+    description:
+      "Sed velit mattis ipsum mi, quam turpis porttitor duis, ipsum fusce congue at, etiam sit nec erat...",
+    images:
+      ["https://images.unsplash.com/photo-1542038784456-1ea8e935640e?auto=format&fit=crop&q=80&w=600"],
   },
   {
-    id: "4",
-    name: "Women's Wardrobe Essentials",
-    images: ["https://i.pinimg.com/736x/57/0c/5a/570c5a69781b17b3e0eec85311f78f33.jpg"],
-    category: "Women's Fashion",
-    description: "Building the perfect capsule wardrobe",
-    owner: "Women's Editor",
-    date: "Dec 8, 2024"
+    id: 4,
+    name: "Notify What Makes You Happy, Smile More!",
+    category: "LIFESTYLE, TRAVEL",
+    owner: "Martin Gray",
+    date: "May 30, 2019",
+    description:
+      "Sed velit mattis ipsum mi, quam turpis porttitor duis, ipsum fusce congue at, etiam sit nec erat...",
+    images:
+      ["https://images.unsplash.com/photo-1494790108377-be9c29b29330?auto=format&fit=crop&q=80&w=600"],
   },
   {
-    id: "5",
-    name: "Handbag Trends",
-    images: ["https://i.pinimg.com/736x/9e/4f/ad/9e4fad34fc3f5bf2d1f1915cea1a317c.jpg"],
-    category: "Bags",
-    description: "The latest in luxury handbag designs",
-    owner: "Bag Specialist",
-    date: "Dec 5, 2024"
+    id: 5,
+    name: "Do you Have A Passion for Photography",
+    category: "BEAUTY, LIFESTYLE",
+    owner: "Martin Gray",
+    date: "May 31, 2019",
+    description:
+      "Sed velit mattis ipsum mi, quam turpis porttitor duis, ipsum fusce congue at, etiam sit nec erat...",
+    images:
+      ["https://images.unsplash.com/photo-1542038784456-1ea8e935640e?auto=format&fit=crop&q=80&w=600"],
   },
   {
-    id: "6",
-    name: "Watch Collection Guide",
-    images: ["https://i.pinimg.com/736x/a6/86/8f/a6868f8f9dd1314931021884b4a9d6fd.jpg"],
-    category: "Watches",
-    description: "Timeless pieces for every occasion",
-    owner: "Watch Expert",
-    date: "Dec 3, 2024"
-  }
+    id: 6,
+    name: "Notify What Makes You Happy, Smile More!",
+    category: "LIFESTYLE, TRAVEL",
+    owner: "Martin Gray",
+    date: "May 30, 2019",
+    description:
+      "Sed velit mattis ipsum mi, quam turpis porttitor duis, ipsum fusce congue at, etiam sit nec erat...",
+    images:
+      ["https://images.unsplash.com/photo-1494790108377-be9c29b29330?auto=format&fit=crop&q=80&w=600"],
+  },
+  
 ];
 
 export default function Blogs() {
+  const { category } = useParams<{ category?: string }>();
   const [showRecent, setShowRecent] = useState(true);
   const [showArchives, setShowArchives] = useState(true);
   const [showCategories, setShowCategories] = useState(true);
@@ -80,12 +97,18 @@ export default function Blogs() {
 
       {/* Page Header */}
       <section className="bg-gray-50">
-        <div className="text-center py-16 bg-white">
-          <h1 className="text-3xl font-semibold text-gray-900">
-            Checkout Our Blogs
-          </h1>
-          <p className="text-gray-500 mt-2">B-Different</p>
-        </div>
+        <header className="py-12 text-center bg-[#f9f9f9] border-b mb-10">
+        <h1 className="text-5xl font-bold text-gray-700 mb-2 capitalize">
+          {category || "Blog"}
+        </h1>
+
+        <nav className="text-xs text-gray-400 uppercase tracking-widest">
+          <Link to="/" className="hover:text-blue-500">
+            Home
+          </Link>{" "}
+          / <span>{category || "Blog"}</span>
+        </nav>
+      </header>
 
         {/* Main layout */}
         <div className="max-w-7xl mx-auto px-6 py-14 grid grid-cols-1 lg:grid-cols-4 gap-12">
@@ -168,13 +191,10 @@ export default function Blogs() {
                     May 2019
                   </li>
                   <li className="hover:text-blue-600 cursor-pointer">
-                    January 2020
+                    Feb 2022
                   </li>
                   <li className="hover:text-blue-600 cursor-pointer">
-                    September 2023
-                  </li>
-                  <li className="hover:text-blue-600 cursor-pointer">
-                    January 2025
+                    Sept 2025
                   </li>
                 </ul>
               )}

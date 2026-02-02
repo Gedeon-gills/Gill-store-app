@@ -10,9 +10,9 @@ export default function Favourites() {
       <Layout>
         <div className="bg-gray-100 py-14 text-center">
           <h1 className="text-3xl font-semibold text-gray-800">
-            My World, My Desires
+            My Wishlist
           </h1>
-          <p className="text-sm text-gray-500 mt-2">My Wishlist</p>
+          <p className="text-sm text-gray-500 mt-2">Favourites one</p>
         </div>
         
         <div className="max-w-7xl mx-auto px-6 py-16">

@@ -71,18 +71,19 @@ const LoginModal: React.FC<LoginModalProps> = ({ isOpen, onClose, onLoginSuccess
         setIsLoginView(true);
         setError('Account created successfully! Please login.');
       }
-    } catch (err: any) {
-      console.error('Full error:', err);
-      console.error('Error response:', err.response);
+    } catch (err: unknown) {
+      const error = err as Error & { response?: { status?: number } };
+      console.error('Full error:', error);
+      console.error('Error response:', error.response);
       
       // Handle different error scenarios with user-friendly messages
-      if (err.response?.status === 401) {
+      if (error.response?.status === 401) {
         setError('Invalid email or password. Please try again.');
-      } else if (err.response?.status === 404) {
+      } else if (error.response?.status === 404) {
         setError('Account not found. Please check your email or create an account.');
-      } else if (err.response?.status === 500) {
+      } else if (error.response?.status === 500) {
         setError('Server error. Please try again later.');
-      } else if (err.message === 'Network Error') {
+      } else if (error.message === 'Network Error') {
         setError('Network error. Please check your connection.');
       } else {
         setError('Invalid email or password. Please try again.');
@@ -293,7 +294,7 @@ const LoginModal: React.FC<LoginModalProps> = ({ isOpen, onClose, onLoginSuccess
                 className="text-[#2b78ef] text-xs sm:text-sm font-bold hover:underline"
               >
                 {isLoginView
-                  ? "New to Kapee? Create an account"
+                  ? "New to Gillstore? Create an account"
                   : "Already have an account? Login"}
               </button>
             </div>

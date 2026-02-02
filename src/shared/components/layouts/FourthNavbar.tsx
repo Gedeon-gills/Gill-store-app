@@ -8,11 +8,18 @@ import LoginModal from "../ui/login";
 import PageLoader from "../ui/PageLoader";
 import UserAvatar from "../ui/UserAvatar";
 
+interface User {
+  id: string;
+  name: string;
+  email: string;
+  avatar?: string;
+}
+
 export default function StickyNavBar() {
   const location = useLocation();
   const navigate = useNavigate();
   const [show, setShow] = useState(false);
-  const [user, setUser] = useState<any>(null);
+  const [user, setUser] = useState<User | null>(null);
   const [isCartOpen, setIsCartOpen] = useState(false);
   const [isLoginOpen, setIsLoginOpen] = useState(false);
   const [loading, setLoading] = useState(false);
@@ -103,9 +110,9 @@ export default function StickyNavBar() {
     >
       <div className="flex justify-between items-center p-2 sm:p-4 max-w-7xl mx-auto">
         {/* Logo */}
-        <Link to="/" className="nav-sticky-logo text-base sm:text-xl font-bold text-white hover:text-gray-200 transition-colors">
-          B-DIFFERENT
-        </Link>
+        <div className="text-white text-2xl sm:text-3xl font-bold">
+          GillStore<span className="text-white">.</span>
+        </div>
 
         {/* Center - Home Features */}
         <div className="flex items-center gap-2 sm:gap-4">

@@ -7,11 +7,31 @@ import RegisterModal from "../ui/register";
 import PageLoader from "../ui/PageLoader";
 import UserAvatar from "../ui/UserAvatar";
 
+interface User {
+  id: string;
+  name: string;
+  email: string;
+  avatar?: string;
+}
+
+const getInitialUser = (): User | null => {
+  const storedUser = localStorage.getItem('user');
+  if (storedUser && storedUser !== 'undefined') {
+    try {
+      return JSON.parse(storedUser);
+    } catch (error) {
+      console.error('Error parsing user data:', error);
+      localStorage.removeItem('user');
+    }
+  }
+  return null;
+};
+
 export default function SecondNavBar() {
   const [isCartOpen, setIsCartOpen] = useState(false);
   const [isLoginOpen, setIsLoginOpen] = useState(false);
   const [isRegisterOpen, setIsRegisterOpen] = useState(false);
-  const [user, setUser] = useState<any>(null);
+  const [user, setUser] = useState<User | null>(getInitialUser);
   const [loading, setLoading] = useState(false);
   
   const openLogin = () => setIsLoginOpen(true);
@@ -23,17 +43,6 @@ export default function SecondNavBar() {
   const navigate = useNavigate();
 
   useEffect(() => {
-    const storedUser = localStorage.getItem('user');
-    if (storedUser && storedUser !== 'undefined') {
-      try {
-        setUser(JSON.parse(storedUser));
-      } catch (error) {
-        console.error('Error parsing user data:', error);
-        localStorage.removeItem('user');
-      }
-    }
-
-    // Listen for user updates
     const handleUserUpdate = () => {
       const updatedUser = localStorage.getItem('user');
       if (updatedUser && updatedUser !== 'undefined') {
@@ -64,29 +73,24 @@ export default function SecondNavBar() {
     <nav className="bg-blue-600 py-2 sm:py-4 h-auto justify-baseline">
       <ul className="max-w-7xl mx-auto px-2 sm:px-4 flex flex-col sm:flex-row items-center justify-between gap-3 sm:gap-6 mt-4 sm:mt-10">
         {/* LOGO */}
-        <li className="text-white text-xl sm:text-2xl font-bold tracking-wide order-1">
-          B-DIFFERENT
-        </li>
+        <div className="text-white text-2xl sm:text-3xl font-bold">
+          GillStore<span className="text-white">.</span>
+        </div>
 
-        {/* SEARCH BAR */}
-        <li className="flex items-center bg-white rounded-full px-3 sm:px-5 py-2 flex-1 w-full sm:max-w-xl order-3 sm:order-2">
+        {/* Desktop Search */}
+        <div className="hidden sm:flex flex-1 mx-4">
           <input
-            type="text"
-            placeholder="clothes..."
-            className="flex-1 outline-none text-xs sm:text-sm text-gray-700"
+            className="w-full h-12 px-6 rounded-l-full bg-white text-gray-600 text-sm focus:outline-none"
+            placeholder="Search products..."
           />
-          <FaSearch className="text-gray-500 text-xs sm:text-sm cursor-pointer" />
-        </li>
+          <select className="px-4 text-sm border-l bg-white text-gray-600">
+            <option>All Categories</option>
+          </select>
+          <button className="bg-white px-5 rounded-r-full"><FaSearch /></button>
+        </div>
         
         {/* ACTIONS */}
         <div className="flex items-center gap-4 sm:gap-6 order-2 sm:order-3">
-          {/* SHOP */}
-          <li className="p-2 sm:p-1 rounded-lg sm:rounded-none hover:bg-blue-700 sm:hover:bg-transparent transition-colors">
-            <Link to={"/shop"} className="flex items-center gap-1 text-white text-xs sm:text-sm font-medium hover:opacity-80">
-              <FaSearch className="text-lg sm:text-sm" />
-              <span className="hidden sm:inline">SHOP</span>
-            </Link>
-          </li>
 
           {/* BLOGS */}
           <li className="p-2 sm:p-1 rounded-lg sm:rounded-none hover:bg-blue-700 sm:hover:bg-transparent transition-colors">

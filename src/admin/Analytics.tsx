@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import Sidebar from "../components/Sidebar";
-import { adminAPI } from "../shared/services/adminAPI";
+// import { adminAPI } from "../shared/services/adminAPI";
 import { FaArrowUp, FaArrowDown, FaUsers, FaShoppingCart, FaDollarSign, FaEye } from "react-icons/fa";
 
 interface AnalyticsData {
@@ -81,13 +81,25 @@ export default function Analytics() {
     fetchAnalytics();
   }, [timeRange]);
 
-  const MetricCard = ({ title, current, previous, change, icon: Icon, color }: any) => (
+interface MetricCardProps {
+  title: string;
+  current: number;
+  previous: number;
+  change: number;
+  icon: React.ComponentType<{ className?: string }>;
+  color: string;
+}
+
+  const MetricCard = ({ title, current, previous, change, icon: Icon, color }: MetricCardProps) => (
     <div className="bg-white p-6 rounded-xl shadow-sm border border-gray-100">
       <div className="flex items-center justify-between">
         <div>
           <p className="text-sm font-medium text-gray-600">{title}</p>
           <p className="text-2xl font-bold text-gray-900 mt-2">
             {title.includes('Revenue') ? `$${current.toLocaleString()}` : current.toLocaleString()}
+          </p>
+          <p className="text-sm text-gray-500 mt-1">
+            Previous: {title.includes('Revenue') ? `$${previous.toLocaleString()}` : previous.toLocaleString()}
           </p>
           <div className="flex items-center mt-2">
             {change >= 0 ? (

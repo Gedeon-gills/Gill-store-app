@@ -1,175 +1,147 @@
-import { FaLocationPin, FaClock, FaMailchimp, FaPhone } from "react-icons/fa6";
-import Header from "../forms/Headers";
+import Navbar from "../layouts/contNav";
+import ScrollButton from "../ui/buttons/scrollButton";
 import Footer from "../forms/Footer";
+import { Link } from "react-router-dom";
+import { FaMap, FaPhone, FaEnvelope, FaClock } from "react-icons/fa6";
 
-export default function ContactUs() {
+const ContactPage: React.FC = () => {
   return (
-    <div className="bg-white">
-      <Header />
+    <div className="bg-white font-sans text-gray-800">
+      <section className="relative h-[300px] bg-cover bg-center bg-no-repeat bg-[url('/image/collection/lens-by-benji-sFEcIgnhxnw-unsplash.jpg')] py-16 text-center">
+        <div className="absolute inset-0 bg-black/60"></div>
 
-      {/* ===== Page Header ===== */}
-      <div className="text-center py-20 bg-gray-50">
-        <h1 className="text-4xl font-semibold text-gray-800">Contact Us</h1>
-        <p className="text-gray-500 mt-3">B-DIFFERENT</p>
-      </div>
+        <div className="relative z-10 text-white">
+          <Navbar />
+          <ScrollButton />
+          <h1 className="text-4xl font-bold mb-2">Contact Us</h1>
+          <div className="text-[14px]">
+            <span className="hover:text-blue-500"><Link to="/">Home</Link></span>
+            <span className="mx-1">/</span>
+            <span className="text-white">Contact</span>
+          </div>
+        </div>
+      </section>
 
-      {/* ===== Map Section ===== */}
-      <div className="w-full h-[450px] bg-gray-200">
+      <div className="mx-2 mt-1 w-[99%] h-[450px] bg-gray-200 rounded-xl overflow-hidden shadow-md">
         <iframe
           title="Office Location"
-          src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3987.511993875192!2d30.0881484!3d-1.9394677!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x19dca6eb4b136305%3A0xfa7ecaf4c40f3383!2skLab!5e0!3m2!1sen!2srw!4v1700000000000"
+          src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3988.844200783366!2d30.0881484!3d-1.9394677!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x19dca6eb4b136305%3A0xfa7ecaf4c40f3383!2skLab!5e0!3m2!1sen!2srw!4v1706000000000"
           className="w-full h-full border-0"
-          referrerPolicy="no-referrer-when-downgrade"
-        ></iframe>
+          allowFullScreen
+          loading="lazy"
+        />
       </div>
- 
-      {/* ===== Content ===== */}
-      <div className="max-w-7xl mx-auto px-6 py-20 grid grid-cols-1 lg:grid-cols-2 gap-16">
-        {/* ===== Contact Form ===== */}
-        <form className="space-y-6">
-          <h1 className="text-2xl font-semibold text-gray-800">
-            Send Us A Message
-          </h1>
-          <p className="text-gray-600">
-            Contact us to get any help or offer us your suggestions
+
+      <div className="max-w-7xl mx-auto px-4 py-16 grid grid-cols-1 md:grid-cols-2 gap-12">
+        <div>
+          <h2 className="text-2xl font-semibold mb-2">Send Us Message</h2>
+          <p className="text-gray-500 mb-8 text-sm">
+            Contact us to get any support or help.
           </p>
 
-          <div className="space-y-2">
-            <label className="text-sm font-medium text-gray-700">
-              Your Name (Required)
-            </label>
-            <input
-              type="text"
-              className="w-full border px-4 py-3 focus:outline-none focus:border-black"
-            />
-          </div>
+          <form className="space-y-4">
+            <div>
+              <label className="block text-sm mb-1 text-gray-600">
+                Your Name (required)
+              </label>
+              <input
+                type="text"
+                className="w-full border border-gray-300 p-3 rounded focus:outline-blue-500"
+                required
+              />
+            </div>
+            <div>
+              <label className="block text-sm mb-1 text-gray-600">
+                Your Email (required)
+              </label>
+              <input
+                type="email"
+                className="w-full border border-gray-300 p-3 rounded focus:outline-blue-500"
+                required
+              />
+            </div>
+            <div>
+              <label className="block text-sm mb-1 text-gray-600">
+                Subject
+              </label>
+              <input
+                type="text"
+                className="w-full border border-gray-300 p-3 rounded focus:outline-blue-500"
+              />
+            </div>
+            <div>
+              <label className="block text-sm mb-1 text-gray-600">
+                Your Message
+              </label>
+              <textarea
+                rows={5}
+                className="w-full border border-gray-300 p-3 rounded focus:outline-blue-500"
+              ></textarea>
+            </div>
+            <button className="bg-[#2b59ff] text-white px-8 py-3 rounded font-medium hover:bg-blue-700 transition">
+              SEND MESSAGE
+            </button>
+          </form>
+        </div>
 
-          <div className="space-y-2">
-            <label className="text-sm font-medium text-gray-700">
-              Your Email (Required)
-            </label>
-            <input
-              type="email"
-              className="w-full border px-4 py-3 focus:outline-none focus:border-black"
-            />
-          </div>
-
-          <div className="space-y-2">
-            <label className="text-sm font-medium text-gray-700">Subject</label>
-            <input
-              type="text"
-              className="w-full border px-4 py-3 focus:outline-none focus:border-black"
-            />
-          </div>
-
-          <div className="space-y-2">
-            <label className="text-sm font-medium text-gray-700">
-              Your Message
-            </label>
-            <textarea
-              rows={5}
-              className="w-full border px-4 py-3 focus:outline-none focus:border-black"
-            />
-          </div>
-
-          <button
-            type="submit"
-            className="bg-black text-white px-8 py-3 text-sm font-semibold hover:bg-gray-800 transition"
-          >
-            SEND A MESSAGE
-          </button>
-        </form>
-
-        {/* ===== Contact Info ===== */}
-        <div className="space-y-12">
-          {/* Intro */}
+        <div className="space-y-10">
           <div>
-            <h1 className="text-2xl font-semibold text-gray-800 mb-3">
-              GET IN TOUCH
-            </h1>
-            <p className="text-gray-600 leading-relaxed">
-              B-Different is always ready to help. Reach out to us using the
-              information below.
+            <h2 className="text-2xl font-semibold mb-4">Get In Touch</h2>
+            <p className="text-gray-500 leading-relaxed text-sm">
+              Lorem ipsum dolor sit amet, consectetur adipiscing elit. Curabitur
+              pretium nisi feugiat nisi gravida, eget rutrum ligula placerat.
             </p>
           </div>
 
-          {/* Office */}
-          <div>
-            <h2 className="text-lg font-semibold text-gray-800 mb-4">
-              Our Office
-            </h2>
-
-            <p className="flex items-center gap-3 text-gray-600 mb-3">
-              <FaLocationPin />
-              Address: Kimihurura, Rwanda
-            </p>
-
-            <p className="flex items-center gap-3 text-gray-600 mb-3">
-              <FaPhone />
-              Phone: (+250) 785-220-022
-            </p>
-
-            <p className="flex items-center gap-3 text-gray-600">
-              <FaMailchimp />
-              Email: tresormugish07@gmail.com
-            </p>
+          <div className="space-y-6">
+            <h3 className="font-bold text-lg border-b pb-2">Our Office</h3>
+            <div className="flex items-start gap-4">
+              <FaMap className="text-blue-600 w-5 h-5 mt-1" />
+              <p className="text-sm">Address: 105 Street, Kigali, Rwanda.</p>
+            </div>
+            <div className="flex items-center gap-4">
+              <FaPhone className="text-blue-600 w-5 h-5" />
+              <p className="text-sm">Phone: (+250) 345 987 102</p>
+            </div>
+            <div className="flex items-center gap-4">
+              <FaEnvelope className="text-blue-600 w-5 h-5" />
+              <p className="text-sm">Email: Mail@Example.com</p>
+            </div>
           </div>
 
-          {/* Working Hours */}
-          <div>
-            <h2 className="text-lg font-semibold text-gray-800 mb-4">
-              Working Hours
-            </h2>
-
-            <p className="flex items-center gap-3 text-gray-600 mb-2">
-              <FaClock />
-              Monday - Friday: 9am to 7pm
-            </p>
-
-            <p className="flex items-center gap-3 text-gray-600 mb-2">
-              <FaClock />
-              Saturday: 9am to 2pm
-            </p>
-
-            <p className="flex items-center gap-3 text-gray-600">
-              <FaClock />
-              Sunday: Closed
-            </p>
+          <div className="space-y-4">
+            <h3 className="font-bold text-lg border-b pb-2">Working Hours</h3>
+            <div className="flex items-start gap-4">
+              <FaClock className="text-blue-600 w-5 h-5 mt-1" />
+              <div className="text-sm text-gray-600 space-y-1">
+                <p>Monday - Friday: 9am to 7pm</p>
+                <p>Saturday: 9am to 2pm</p>
+                <p>Sunday: Closed</p>
+              </div>
+            </div>
           </div>
         </div>
       </div>
-      {/* ===== CTA Section ===== */}
-      <div
-        className="relative bg-center bg-cover bg-no-repeat"
-        style={{
-          backgroundImage:
-            "url('https://i.pinimg.com/736x/8a/01/57/8a01579d53988a2bba62d34f4f68fdca.jpg')",
-        }}
+
+      <section
+        className="relative bg-[url('/image/collection/flipsnack-6QNipEp6v_4-unsplash.jpg')] 
+             bg-cover bg-center py-16 text-center text-white"
       >
-        {/* Blue Overlay */}
-        <div className="absolute inset-0 bg-blue-900/80"></div>
+        <div className="absolute inset-0 bg-[#2b59ff]/70"></div>
 
-        {/* Content */}
-        <div className="relative max-w-7xl mx-auto px-6 py-24 text-center text-white">
-          <h2 className="text-3xl md:text-4xl font-semibold mb-4">
-            Do You Have Any Questions?
-          </h2>
-
-          <p className="text-lg text-blue-100 mb-8 max-w-2xl mx-auto">
-            Feel free to contact us anytime. We are happy to help you with your
-            business needs.
+        <div className="relative z-10">
+          <h2 className="text-3xl font-bold mb-4">Want To Work With Us?</h2>
+          <p className="mb-8 opacity-90">
+            Feel free to reach us with the contact form!
           </p>
-
-          <a
-            href="/contact-us"
-            className="inline-block bg-white text-blue-900 px-8 py-3 font-semibold text-sm hover:bg-gray-100 transition"
-          >
+          <button className="border-2 border-white px-10 py-3 font-semibold hover:bg-white hover:text-blue-600 transition">
             CONTACT US
-          </a>
+          </button>
         </div>
-      </div>
-
+      </section>
       <Footer />
     </div>
   );
-}
+};
+
+export default ContactPage;

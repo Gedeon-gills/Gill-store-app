@@ -38,6 +38,7 @@ export default function Products({
         
         setProducts(displayedProducts);
       } catch (err) {
+        console.error('Error fetching products:', err);
         setError('Failed to load products');
       } finally {
         setLoading(false);

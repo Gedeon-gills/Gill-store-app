@@ -1,85 +1,101 @@
-import { FaBlog, FaPhone, FaBook } from "react-icons/fa";
-import React from "react";
+import { useState } from "react";
 import { Link } from "react-router-dom";
-export default function FirstNavBar() {
-  const [LangOpen, setLangOpen] = React.useState(false);
-  const [CurrOpen, setCurrOpen] = React.useState(false);
+
+export default function TopBar() {
+  const [langOpen, setLangOpen] = useState(false);
+  const [currencyOpen, setCurrencyOpen] = useState(false);
+  const [moreOpen, setMoreOpen] = useState(false);
 
   return (
-    <nav className="bg-blue-600 text-white text-xs px-2 sm:px-4 lg:px-6 py-1.5 flex items-center justify-between">
-      {/* Left - Language & Currency (Hidden on mobile) */}
-      <div className="hidden md:flex items-center gap-4">
-        <div
-          className="relative"
-          onMouseEnter={() => setLangOpen(true)}
-          onMouseLeave={() => setLangOpen(false)}
-        >
-          <div className="cursor-pointer hover:text-gray-200">LANGUAGES</div>
+    <div className="bg-blue-700 text-white text-sm">
+      <div className="max-w-7xl mx-auto flex justify-between items-center px-4 py-2">
+        
+        {/* LEFT: Language & Currency */}
+        <div className="flex gap-4 items-center">
+          {/* Language */}
+          <div className="relative">
+            <span
+              className="cursor-pointer px-2 py-1 hover:bg-blue-800 rounded"
+              onClick={() => setLangOpen(!langOpen)}
+            >
+              English ▾
+            </span>
+            {langOpen && (
+              <div className="absolute top-full left-0 mt-1 w-32 bg-white text-gray-700 border border-gray-200 shadow-md z-50">
+                {["English", "French", "Spanish"].map((lang) => (
+                  <div
+                    key={lang}
+                    className="px-4 py-2 hover:bg-gray-100 cursor-pointer"
+                    onClick={() => setLangOpen(false)}
+                  >
+                    {lang}
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
 
-          {LangOpen && (
-            <ul className="absolute top-full left-0 mt-1 bg-white text-gray-800 rounded shadow-sm min-w-[120px] z-50">
-              <li className="px-3 py-1.5 hover:bg-gray-100 cursor-pointer text-xs">
-                ENGLISH
-              </li>
-              <li className="px-3 py-1.5 hover:bg-gray-100 cursor-pointer text-xs">
-                FRENCH
-              </li>
-              <li className="px-3 py-1.5 hover:bg-gray-100 cursor-pointer text-xs">
-                KINYARWANDA
-              </li>
-            </ul>
+          {/* Currency */}
+          <div className="relative">
+            <span
+              className="cursor-pointer px-2 py-1 hover:bg-blue-800 rounded"
+              onClick={() => setCurrencyOpen(!currencyOpen)}
+            >
+              $ Dollar ▾
+            </span>
+            {currencyOpen && (
+              <div className="absolute top-full left-0 mt-1 w-36 bg-white text-gray-700 border border-gray-200 shadow-md z-50">
+                {["$ Dollar (US)", "€ Euro (EUR)", "£ Pound (UK)"].map((cur) => (
+                  <div
+                    key={cur}
+                    className="px-4 py-2 hover:bg-gray-100 cursor-pointer"
+                    onClick={() => setCurrencyOpen(false)}
+                  >
+                    {cur}
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
+        </div>
+
+        {/* RIGHT: Links */}
+        <div className="hidden sm:flex gap-6 items-center">
+          <span>Welcome to our store!</span>
+          <span className="cursor-pointer">Blog</span>
+          <span className="cursor-pointer">FAQ</span>
+          <span className="cursor-pointer">
+            <Link to={"/ContactUs"}>Contact Us</Link>
+          </span>
+        </div>
+
+        {/* MOBILE: More dropdown */}
+        <div className="sm:hidden relative">
+          <button
+            className="px-2 py-1 border rounded"
+            onClick={() => setMoreOpen(!moreOpen)}
+          >
+            More ▾
+          </button>
+          {moreOpen && (
+            <div className="absolute right-0 mt-1 w-40 bg-white text-gray-700 border border-gray-200 shadow-md z-50 flex flex-col">
+              <span className="px-4 py-2 hover:bg-gray-100 cursor-pointer">
+                Welcome to our store!
+              </span>
+              <span className="px-4 py-2 hover:bg-gray-100 cursor-pointer">
+                Blog
+              </span>
+              <span className="px-4 py-2 hover:bg-gray-100 cursor-pointer">
+                FAQ
+              </span>
+              <span className="px-4 py-2 hover:bg-gray-100 cursor-pointer">
+                <Link to={"/ContactUs"}>Contact Us</Link>
+              </span>
+            </div>
           )}
         </div>
 
-        <div
-          className="relative"
-          onMouseEnter={() => setCurrOpen(true)}
-          onMouseLeave={() => setCurrOpen(false)}
-        >
-          <div className="cursor-pointer hover:text-gray-200">CURRENCY</div>
-
-          {CurrOpen && (
-            <ul className="absolute top-full left-0 mt-1 bg-white text-gray-800 rounded shadow-sm min-w-[100px] z-50">
-              <li className="px-3 py-1.5 hover:bg-gray-100 cursor-pointer text-xs">
-                RWF
-              </li>
-              <li className="px-3 py-1.5 hover:bg-gray-100 cursor-pointer text-xs">
-                USD
-              </li>
-              <li className="px-3 py-1.5 hover:bg-gray-100 cursor-pointer text-xs">
-                EUR
-              </li>
-            </ul>
-          )}
-        </div>
       </div>
-
-      {/* Center - Welcome Message */}
-      <h3 className="font-medium tracking-wide text-center flex-1 md:flex-none text-xs sm:text-sm">
-        WELCOME TO OUR STORE
-      </h3>
-
-      {/* Right - Links */}
-      <ul className="hidden sm:flex gap-2 lg:gap-4">
-        <li className="flex items-center gap-1 cursor-pointer hover:text-gray-200">
-          <FaBlog className="text-[10px]" /> <Link to={"/BLogs"}>BLOG</Link>
-        </li>
-        <li className="flex items-center gap-1 cursor-pointer hover:text-gray-200">
-          <FaBook className="text-[10px]" /> <Link to={"/FAQ"}>FAQ</Link>
-        </li>
-        <li className="flex items-center gap-1 cursor-pointer hover:text-gray-200">
-          <FaPhone className="text-[10px]" />
-          <Link to={"/ContactUs"} className="hidden lg:inline">CONTACT US</Link>
-          <Link to={"/ContactUs"} className="lg:hidden">CONTACT</Link>
-        </li>
-      </ul>
-
-      {/* Mobile - Contact only */}
-      <div className="sm:hidden">
-        <Link to={"/ContactUs"} className="flex items-center gap-1 cursor-pointer hover:text-gray-200">
-          <FaPhone className="text-[10px]" /> CONTACT
-        </Link>
-      </div>
-    </nav>
+    </div>
   );
 }
