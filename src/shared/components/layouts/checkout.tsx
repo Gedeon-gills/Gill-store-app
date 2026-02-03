@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useCart } from "./cartcontext";
-import { orderService } from "../../services/orderService";
+import  orderService  from "../../services/order";
 import Layout from "./layout";
 import type { Product } from "../../store/products";
 
@@ -53,27 +53,14 @@ const Checkout = () => {
       const cartName = `${userData.username}_cart`;
       
       const orderData = {
-        customerInfo: {
-          name: `${formData.firstName} ${formData.lastName}`,
-          email: formData.email,
-          phone: formData.phone,
-          address: `${formData.address}, ${formData.city}, ${formData.zipCode}`
-        },
-        items: cart.map(item => ({
-          productId: item.id,
-          name: item.name,
-          price: item.price,
-          quantity: item.quantity
-        })),
-        total,
-        paymentMethod: formData.paymentMethod
+        cartName: cartName
       };
       
       const result = await orderService.createOrder(orderData);
-      setOrderNumber(result.orderNumber || result._id);
+      setOrderNumber(result.order.orderId || result.order._id);
       
       // Clear cart after successful order
-      await orderService.clearCart(cartName);
+      localStorage.removeItem(cartName);
       
       setOrderComplete(true);
     } catch (error) {

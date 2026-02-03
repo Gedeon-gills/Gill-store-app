@@ -1,7 +1,8 @@
+/* eslint-disable react-refresh/only-export-components */
 import React, { createContext, useContext, useState, useEffect } from "react";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { cartService } from "../../services/cartService";
-import { orderService } from "../../services/orderService";
+import  cartService  from "../../services/cart";
+import  orderService  from "../../services/order";
 import type { Product } from "../../store/products";
 
 interface CartItem extends Product {
@@ -35,14 +36,14 @@ export const CartProvider: React.FC<{ children: React.ReactNode }> = ({
             setCart(cartData.items);
           }
         } catch (error) {
-          console.error('Failed to load cart:', error);
+          console.error("Failed to load cart:", error);
           // Load from localStorage as fallback
           const localCart = localStorage.getItem(cartName);
           if (localCart) {
             try {
               setCart(JSON.parse(localCart));
             } catch (e) {
-              console.error('Failed to parse local cart:', e);
+              console.error("Failed to parse local cart:", e);
             }
           }
         }
@@ -62,13 +63,13 @@ export const CartProvider: React.FC<{ children: React.ReactNode }> = ({
   // Get user cart name
   useEffect(() => {
     const checkUser = () => {
-      const user = localStorage.getItem('user');
-      if (user && user !== 'undefined') {
+      const user = localStorage.getItem("user");
+      if (user && user !== "undefined") {
         try {
           const userData = JSON.parse(user);
           setCartName(`${userData.username}_cart`);
         } catch (error) {
-          console.error('Error parsing user data:', error);
+          console.error("Error parsing user data:", error);
         }
       } else {
         setCartName("");
@@ -76,18 +77,18 @@ export const CartProvider: React.FC<{ children: React.ReactNode }> = ({
     };
 
     checkUser();
-    
+
     // Listen for user updates
     const handleUserUpdate = () => {
       checkUser();
     };
 
-    window.addEventListener('userUpdated', handleUserUpdate);
-    window.addEventListener('storage', handleUserUpdate);
-    
+    window.addEventListener("userUpdated", handleUserUpdate);
+    window.addEventListener("storage", handleUserUpdate);
+
     return () => {
-      window.removeEventListener('userUpdated', handleUserUpdate);
-      window.removeEventListener('storage', handleUserUpdate);
+      window.removeEventListener("userUpdated", handleUserUpdate);
+      window.removeEventListener("storage", handleUserUpdate);
     };
   }, []);
 
@@ -95,22 +96,22 @@ export const CartProvider: React.FC<{ children: React.ReactNode }> = ({
   const addToCartMutation = useMutation({
     mutationFn: cartService.addToCart,
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['cart'] });
-    }
+      queryClient.invalidateQueries({ queryKey: ["cart"] });
+    },
   });
 
   // Remove from cart mutation
   const removeFromCartMutation = useMutation({
     mutationFn: cartService.removeFromCart,
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['cart'] });
-    }
+      queryClient.invalidateQueries({ queryKey: ["cart"] });
+    },
   });
 
   const addToCart = (product: Product) => {
-    const currentUser = localStorage.getItem('user');
-    if (!currentUser || currentUser === 'undefined') {
-      alert('Please login to add items to cart');
+    const currentUser = localStorage.getItem("user");
+    if (!currentUser || currentUser === "undefined") {
+      alert("Please login to add items to cart");
       return;
     }
 
@@ -121,7 +122,8 @@ export const CartProvider: React.FC<{ children: React.ReactNode }> = ({
         currentCartName = `${userData.username}_cart`;
         setCartName(currentCartName);
       } catch (error) {
-        alert('Please login to add items to cart');
+        console.error("Error parsing user data for cart:", error);
+        alert("Please login to add items to cart");
         return;
       }
     }
@@ -138,37 +140,35 @@ export const CartProvider: React.FC<{ children: React.ReactNode }> = ({
       }
       return [...cart, { ...product, quantity: 1 }];
     })();
-    
+
     setCart(newCart);
     localStorage.setItem(currentCartName, JSON.stringify(newCart));
 
     // Sync with backend
     addToCartMutation.mutate({
-      CartName: currentCartName,
-      ProductName: product.name,
-      quantity: 1
+      productId: product.id,
+      quantity: 1,
     });
   };
 
   const increaseQty = (id: string) => {
-    const item = cart.find(item => item.id === id);
+    const item = cart.find((item) => item.id === id);
     if (item && cartName) {
       const newCart = cart.map((item) =>
         item.id === id ? { ...item, quantity: item.quantity + 1 } : item,
       );
       setCart(newCart);
       localStorage.setItem(cartName, JSON.stringify(newCart));
-      
+
       addToCartMutation.mutate({
-        CartName: cartName,
-        ProductName: item.name,
-        quantity: 1
+        productId: item.id,
+        quantity: 1,
       });
     }
   };
 
   const decreaseQty = (id: string) => {
-    const item = cart.find(item => item.id === id);
+    const item = cart.find((item) => item.id === id);
     if (item && cartName) {
       if (item.quantity === 1) {
         // Remove from cart
@@ -177,7 +177,7 @@ export const CartProvider: React.FC<{ children: React.ReactNode }> = ({
         localStorage.setItem(cartName, JSON.stringify(newCart));
         removeFromCartMutation.mutate({
           CartName: cartName,
-          ProductName: item.name
+          ProductName: item.name,
         });
       } else {
         // Decrease quantity
@@ -191,13 +191,16 @@ export const CartProvider: React.FC<{ children: React.ReactNode }> = ({
   };
 
   return (
-    <CartContext.Provider value={{ 
-      cart, 
-      addToCart, 
-      increaseQty, 
-      decreaseQty,
-      isLoading: addToCartMutation.isPending || removeFromCartMutation.isPending
-    }}>
+    <CartContext.Provider
+      value={{
+        cart,
+        addToCart,
+        increaseQty,
+        decreaseQty,
+        isLoading:
+          addToCartMutation.isPending || removeFromCartMutation.isPending,
+      }}
+    >
       {children}
     </CartContext.Provider>
   );

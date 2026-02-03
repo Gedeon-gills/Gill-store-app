@@ -1,7 +1,12 @@
-// src/ui/Categories.tsx
 import { useQuery } from "@tanstack/react-query";
 import { CategoryService } from "../../services/category";
 import { useNavigate } from "react-router-dom";
+
+interface Category {
+  id?: string;
+  name: string;
+  image?: string;
+}
 
 export default function Categories() {
   const navigate = useNavigate();
@@ -20,7 +25,7 @@ export default function Categories() {
 
   return (
     <div className="flex flex-wrap py-8 sm:py-12 lg:py-16 gap-4 sm:gap-6 lg:gap-8 justify-center px-4">
-      {(categories as any[]).map((category: any) => (
+      {(categories as Category[]).map((category: Category) => (
         <div
           key={category.id || category.name}
           className="flex flex-col items-center cursor-pointer hover:opacity-80 transition-opacity min-w-[80px] sm:min-w-[100px]"

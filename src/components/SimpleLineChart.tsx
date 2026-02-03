@@ -1,5 +1,3 @@
-import { useState, useEffect } from 'react';
-
 interface ChartData {
   labels: string[];
   data: number[];

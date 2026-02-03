@@ -8,11 +8,14 @@ import ProductHomeCard from "../ui/ProductCard";
 export default function CategoriesWeb() {
   const { name } = useParams<{ name: string }>();
   
-  const { data: products = [], isLoading } = useQuery({
+  const { data, isLoading } = useQuery({
     queryKey: ['products'],
     queryFn: ProductsService.getProducts
   });
-  
+
+  // Ensure products is an array
+  const products = Array.isArray(data) ? data : [];
+
   const categoryProducts = products.filter(
     (p) => p.category?.name?.toLowerCase() === name?.toLowerCase(),
   );

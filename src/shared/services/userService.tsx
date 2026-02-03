@@ -8,29 +8,15 @@ export interface userAuth {
   profile?: string;
   password: string;
   UserType: "admin" | "vendor" | "customer";
-  resetPasswordToken?: String;
+  resetPasswordToken?: string;
   resetPasswordExpires?: Date;
   createdAt: Date;
 }
 export const userService = {
-  // GET all users
-  getUsers: async (params?: {
-    search?: string;
-    role?: string;
-  }): Promise<userAuth> => {
-    const response = await api.get("/auth", { params });
-    return response.data;
-  },
-
-  // GET single user
-  getUser: async (id: string): Promise<userAuth> => {
-    const response = await api.get(`/auth/${id}`);
-    return response.data;
-  },
 
   // GET profile
   getProfile: async (): Promise<userAuth> => {
-    const response = await api.get("/auth/profile");
+    const response = await api.get("/auth/me");
     return response.data;
   },
 
@@ -47,6 +33,7 @@ export const userService = {
     return response.data;
   },
 
+  //login 
   LoginUser: async (userData: {
     email: string;
     password: string;
@@ -55,39 +42,54 @@ export const userService = {
     return response.data;
   },
 
-  // PUT update profile
-  updateProfile: async (userData: FormData): Promise<userAuth> => {
-    const response = await api.put("/auth/profile", userData, {
-      headers: { "Content-Type": "multipart/form-data" }
+  // forgot password
+  forgotPassword: async (email: string) => {
+    const response = await api.post("/auth/forgotPassword", { email });
+    return response.data;
+  },
+
+  //reset password
+  resetPassword: async (token: string, password: string) => {
+    const response = await api.patch(`/auth/resetPassword/${token}`, {
+      password,
     });
+    return response.data;
+  },
+
+  // PUT update profile
+  updateProfile: async (userData: {
+    name?: string;
+    photo?: string;
+  }): Promise<userAuth> => {
+    const response = await api.patch("/auth/updateMe", userData);
     return response.data;
   },
 
   // POST change password
   changePassword: async (passwords: {
-    currentPassword: string;
-    newPassword: string;
+    passwordCurrent: string;
+    password: string;
   }) => {
-    const response = await api.post("/auth/change-password", passwords);
+    const response = await api.patch("/auth/updatePassword", passwords);
+    return response.data;
+  },
+
+  //(admin only)
+  //update user 
+  updateUser: async (
+    id: string,
+    userData: Partial<{ role: string; isActive: boolean }>,
+  ) => {
+    const response = await api.patch(
+      `/auth/admin/users/${id}`,
+      userData,
+    );
     return response.data;
   },
 
   // DELETE account
-  deleteAccount: async (): Promise<{ message: string }> => {
-    const response = await api.delete("/auth/account");
-    return response.data;
-  },
-
-  updateUser: async (
-    id: string,
-    userData: Partial<{ name: string; email: string; role: string }>,
-  ): Promise<userAuth> => {
-    const response = await api.put(`/auth/${id}`, userData);
-    return response.data;
-  },
-
-  deleteUser: async (id: string): Promise<{ message: string }> => {
-    const response = await api.delete(`/auth/${id}`);
+  deleteUser: async (id: string) => {
+    const response = await api.delete(`/auth/admin/users/${id}`);
     return response.data;
   },
 };
