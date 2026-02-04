@@ -1,4 +1,4 @@
-import  { useState } from 'react';
+import  { useState, useEffect } from 'react';
 import { 
   LayoutDashboard, 
   Package, 
@@ -11,10 +11,40 @@ import {
   Menu,
   ChevronRight
 } from 'lucide-react';
-import { NavLink, Outlet, Link } from 'react-router-dom';
+import { NavLink, Outlet, Link, useNavigate } from 'react-router-dom';
+import { useNotifications } from '../shared/contexts/NotificationContext';
+import { adminAPI } from '../shared/services/adminAPI';
 
 export const AdminLayout = () => {
   const [sidebarOpen, setSidebarOpen] = useState(true);
+  const [showNotifications, setShowNotifications] = useState(false);
+  const [adminProfile, setAdminProfile] = useState<any>({
+    name: 'Admin User',
+    email: 'admin@store.com',
+    photo: null
+  });
+  const navigate = useNavigate();
+  const { notifications, unreadCount, markAsRead, markAllAsRead } = useNotifications();
+
+  useEffect(() => {
+    const fetchAdminProfile = async () => {
+      try {
+        const response = await adminAPI.getAdminProfile();
+        console.log('Admin profile response:', response);
+        setAdminProfile(response.data.user);
+      } catch (error) {
+        console.error('Failed to fetch admin profile:', error);
+        // Keep default values if API fails
+      }
+    };
+    fetchAdminProfile();
+  }, []);
+
+  const handleLogout = () => {
+    if (confirm('Are you sure you want to logout?')) {
+      navigate('/');
+    }
+  };
 
   const menuItems = [
     { label: 'Overview', icon: LayoutDashboard, path: '/admin' },
@@ -58,7 +88,10 @@ export const AdminLayout = () => {
         </nav>
 
         <div className="p-4 border-t">
-          <button className="flex items-center gap-3 px-3 py-2.5 w-full text-slate-500 hover:text-red-600 transition-colors font-medium">
+          <button 
+            onClick={handleLogout}
+            className="flex items-center gap-3 px-3 py-2.5 w-full text-slate-500 hover:text-red-600 transition-colors font-medium"
+          >
             <LogOut className="w-5 h-5" />
             {sidebarOpen && <span>Logout</span>}
           </button>
@@ -84,18 +117,63 @@ export const AdminLayout = () => {
           </div>
 
           <div className="flex items-center gap-4">
-            <div className="relative p-2 text-slate-500 hover:bg-slate-50 rounded-lg cursor-pointer">
-              <Bell className="w-5 h-5" />
-              <span className="absolute top-2 right-2.5 w-2 h-2 bg-red-500 border-2 border-white rounded-full"></span>
+            <div className="relative">
+              <button 
+                onClick={() => setShowNotifications(!showNotifications)}
+                className="relative p-2 text-slate-500 hover:bg-slate-50 rounded-lg cursor-pointer"
+              >
+                <Bell className="w-5 h-5" />
+                {unreadCount > 0 && (
+                  <span className="absolute top-2 right-2.5 w-2 h-2 bg-red-500 border-2 border-white rounded-full"></span>
+                )}
+              </button>
+              
+              {showNotifications && (
+                <div className="absolute right-0 top-12 w-80 bg-white border border-slate-200 rounded-lg shadow-lg z-50">
+                  <div className="p-4 border-b flex justify-between items-center">
+                    <h3 className="font-semibold">Notifications</h3>
+                    {unreadCount > 0 && (
+                      <button 
+                        onClick={markAllAsRead}
+                        className="text-sm text-purple-600 hover:text-purple-800"
+                      >
+                        Mark all read
+                      </button>
+                    )}
+                  </div>
+                  <div className="max-h-96 overflow-y-auto">
+                    {notifications.length > 0 ? (
+                      notifications.slice(0, 10).map((notification) => (
+                        <div 
+                          key={notification.id}
+                          className={`p-3 border-b hover:bg-slate-50 cursor-pointer ${
+                            !notification.read ? 'bg-blue-50' : ''
+                          }`}
+                          onClick={() => markAsRead(notification.id)}
+                        >
+                          <p className="text-sm font-medium">{notification.message}</p>
+                          <p className="text-xs text-slate-500 mt-1">
+                            {notification.timestamp.toLocaleString()}
+                          </p>
+                        </div>
+                      ))
+                    ) : (
+                      <div className="p-4 text-center text-slate-500">
+                        No notifications yet
+                      </div>
+                    )}
+                  </div>
+                </div>
+              )}
             </div>
             <div className="h-8 w-px bg-slate-200"></div>
             <div className="flex items-center gap-3 cursor-pointer">
               <div className="text-right hidden sm:block">
-                <p className="text-sm font-bold text-slate-900">Admin User</p>
-                <p className="text-xs text-slate-500">Store Manager</p>
+                <p className="text-sm font-bold text-slate-900">{adminProfile?.name || 'Admin User'}</p>
+                <p className="text-xs text-slate-500">{adminProfile?.email || 'admin@store.com'}</p>
               </div>
               <img 
-                src="https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?q=80&w=2070&auto=format&fit=facearea&facepad=2" 
+                src={adminProfile?.photo || "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?q=80&w=2070&auto=format&fit=facearea&facepad=2"} 
                 alt="Profile" 
                 className="w-10 h-10 rounded-full border border-slate-200"
               />

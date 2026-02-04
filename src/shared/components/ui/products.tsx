@@ -1,8 +1,22 @@
 import ProductHomeCard from "../ui/ProductCard";
-import { ProductsService } from "../../services/productSetUp";
+import { adminAPI } from "../../services/adminAPI";
 import { useState, useEffect } from "react";
 import LoadingSpinner from "../ui/LoadingSpinner";
-import type { ProductResponse } from "../../services/productSetUp";
+
+interface Product {
+  _id: string;
+  name: string;
+  price: number;
+  images: string[];
+  category: string;
+  stock: number;
+  description?: string;
+  createdAt?: string;
+  updatedAt?: string;
+  ratingsAverage?: number;
+  ratingsQuantity?: number;
+}
+
 interface ProductsProps {
   limit?: number;
   category?: string;
@@ -14,19 +28,21 @@ export default function Products({
   category,
   random = false,
 }: ProductsProps) {
-  const [products, setProducts] = useState<ProductResponse[]>([]);
+  const [products, setProducts] = useState<Product[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
     const fetchProducts = async () => {
       try {
-        const data:ProductResponse[] = await ProductsService.getProducts();
-        let displayedProducts = [...data];
-        
+        let response;
         if (category) {
-          displayedProducts = displayedProducts.filter(p => p?.category?.name?.includes(category));
+          response = await adminAPI.getProductsByCategory(category);
+        } else {
+          response = await adminAPI.getProducts();
         }
+        
+        let displayedProducts = response.data?.products || [];
         
         if (random) {
           displayedProducts = displayedProducts.sort(() => Math.random() - 0.5);
@@ -48,8 +64,6 @@ export default function Products({
     fetchProducts();
   }, [limit, category, random]);
 
-  console.log("Products data:", products);
-
   if (loading) return <LoadingSpinner />;
   if (error) return <div className="text-center text-red-500">{error}</div>;
 
@@ -61,12 +75,13 @@ export default function Products({
           id={product._id}
           name={product.name}
           price={product.price}
-          images={product.Images}
-          category={product.category.name}
+          images={product.images || []}
+          category={typeof product.category === 'string' ? 'Product' : product.category}
           breadcrumb=""
-          description=""
-          availability={product.inStock ? "In Stock" : "Out of Stock"}
+          description={product.description || ''}
+          availability={product.stock > 0 ? "In Stock" : "Out of Stock"}
           sku={product._id}
+          date={product.createdAt}
         />
       ))}
     </div>

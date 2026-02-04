@@ -1,20 +1,31 @@
 import { useParams } from "react-router-dom";
-import { ProductsService } from "../../services/productSetUp";
+import { adminAPI } from "../../services/adminAPI";
 import { useState, useEffect } from "react";
 import { useCart } from "../layouts/cartcontext";
 import Layout from "../layouts/layout";
 import { PageLoader } from "../ui/LoadingSpinner";
-import type { ProductResponse } from "../../services/productSetUp";
+import CartDrawer from "../ui/cartsPopup";
+
+interface Product {
+  _id: string;
+  name: string;
+  price: number;
+  images: string[];
+  category: string;
+  stock: number;
+  description?: string;
+  createdAt?: string;
+}
 
 export default function ProductPage() {
   const { id } = useParams<{ id: string }>();
-  const [product, setProduct] = useState<ProductResponse | null>(null);
+  const [product, setProduct] = useState<Product | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const { addToCart } = useCart();
   const [quantity, setQuantity] = useState(1);
-  const [addedToCart, setAddedToCart] = useState(false);
   const [activeImage, setActiveImage] = useState<string>("");
+  const [isCartOpen, setIsCartOpen] = useState(false);
 
   useEffect(() => {
     const fetchProduct = async () => {
@@ -28,11 +39,12 @@ export default function ProductPage() {
           return;
         }
 
-        const data = await ProductsService.getProduct(id);
+        const response = await adminAPI.getProduct(id);
+        const data = response.data?.product || response.product || response.data || response;
         console.log("Product data received:", data);
         setProduct(data);
-        if (data?.Images?.[0]) {
-          setActiveImage(data.Images[0]);
+        if (data?.images?.[0]) {
+          setActiveImage(data.images[0]);
         }
       } catch (err) {
         console.error("Error fetching product:", err);
@@ -70,50 +82,47 @@ export default function ProductPage() {
       id: product._id,
       name: product.name,
       breadcrumb: "",
-      images: product.Images,
+      images: product.images,
       price: product.price,
-      category: product.category.name,
-      description: "",
+      category: typeof product.category === 'string' ? product.category : 'Product',
+      description: product.description || "",
       sku: product._id,
-      availability: product.inStock
-        ? "In Stock"
-        : ("Out of Stock" as "In Stock" | "Out of Stock"),
+      availability: (product.stock > 0 ? "In Stock" : "Out of Stock") as "In Stock" | "Out of Stock",
     };
     addToCart(productForCart);
-    setAddedToCart(true);
-    setTimeout(() => setAddedToCart(false), 2000);
+    setIsCartOpen(true);
   };
 
   return (
     <Layout>
-      <div className="container mx-auto px-4 py-4 sm:py-8">
+      <div className="max-w-[1200px] mx-auto px-4 py-4 sm:py-8">
         <nav className="mb-4 sm:mb-6 text-xs sm:text-sm text-gray-600">
           <span>Home</span> / <span>Products</span> /{" "}
           <span className="text-gray-900">{product.name}</span>
         </nav>
 
         <div className="grid lg:grid-cols-2 gap-6 sm:gap-8 lg:gap-12">
-          <div>
-            <div className="mb-3 sm:mb-4">
-              <img
-                src={activeImage || product.Images[0]}
-                alt={product.name}
-                className="w-full h-[300px] sm:h-[400px] lg:h-[500px] object-cover rounded-lg"
-              />
-            </div>
-            <div className="flex gap-2 sm:gap-3 overflow-x-auto">
-              {product.Images.map((img: string, index: number) => (
+          <div className="flex gap-3 sm:gap-4">
+            <div className="flex flex-col gap-2 sm:gap-3">
+              {product.images.map((img: string, index: number) => (
                 <img
                   key={index}
-                  src={img}
+                  src={img.startsWith('http') ? img : `${import.meta.env.VITE_API_URL || 'http://localhost:5000'}${img}`}
                   onClick={() => setActiveImage(img)}
                   className={`w-16 h-16 sm:w-20 sm:h-20 object-cover rounded cursor-pointer border-2 ${
-                    (activeImage || product.Images[0]) === img
+                    (activeImage || product.images[0]) === img
                       ? "border-blue-500"
                       : "border-gray-200"
                   }`}
                 />
               ))}
+            </div>
+            <div className="max-w-md">
+              <img
+                src={activeImage || product.images[0]}
+                alt={product.name}
+                className="w-full h-[300px] sm:h-[400px] lg:h-[450px] object-cover rounded-lg"
+              />
             </div>
           </div>
 
@@ -166,11 +175,9 @@ export default function ProductPage() {
                   <button className="w-8 h-8 rounded-full bg-red-600 border-2 border-gray-300"></button>
                 </div>
               </div>
-              <p className="text-xs sm:text-sm text-gray-600 mb-2">
-                SKU: {product._id}
-              </p>
+
               <p className="text-xs sm:text-sm text-green-600 font-medium">
-                {product.inStock ? "✓ In Stock" : "✗ Out of Stock"}
+                {product.stock > 0 ? "✓ In Stock" : "✗ Out of Stock"}
               </p>
             </div>
 
@@ -200,25 +207,18 @@ export default function ProductPage() {
 
               <button
                 onClick={handleAddToCart}
-                className={`flex-1 sm:flex-none px-6 sm:px-8 py-3 rounded font-medium transition text-sm sm:text-base ${
-                  addedToCart
-                    ? "bg-green-600 text-white"
-                    : "bg-blue-600 text-white hover:bg-blue-700"
-                }`}
+                className="flex-1 sm:flex-none px-6 sm:px-8 py-3 rounded font-medium transition text-sm sm:text-base bg-blue-600 text-white hover:bg-blue-700"
               >
-                {addedToCart ? "✓ Added to Cart" : "Add to Cart"}
+                Add to Cart
               </button>
             </div>
 
             <div className="border-t pt-6">
               <h3 className="font-semibold mb-3">Product Details</h3>
               <ul className="text-sm text-gray-600 space-y-1">
-                <li>Category: {product.category.name}</li>
-                <li>Size: {product.size || "Not specified"}</li>
                 <li>
-                  Availability: {product.inStock ? "In Stock" : "Out of Stock"}
+                  Availability: {product.stock > 0 ? "In Stock" : "Out of Stock"}
                 </li>
-                <li>SKU: {product._id}</li>
               </ul>
             </div>
           </div>
@@ -250,6 +250,8 @@ export default function ProductPage() {
           </div>
         </div>
       </div>
+      
+      <CartDrawer isOpen={isCartOpen} onClose={() => setIsCartOpen(false)} />
     </Layout>
   );
 }

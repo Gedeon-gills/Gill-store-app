@@ -31,7 +31,7 @@ export default function Shop() {
         <ShopSidebar />
 
         <div className="flex-1">
-          <Products />
+          <Products category={category} />
         </div>
       </div>
 

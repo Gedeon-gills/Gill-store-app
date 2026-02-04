@@ -26,13 +26,28 @@ export default function Orders() {
   const [error, setError] = useState<string | null>(null);
   const [searchTerm, setSearchTerm] = useState("");
   const [statusFilter, setStatusFilter] = useState("all");
+  const [updatingStatus, setUpdatingStatus] = useState<string | null>(null);
 
   useEffect(() => {
     const fetchOrders = async () => {
       try {
         setError(null);
         const data = await adminAPI.getOrders();
-        setOrders(data.orders || data || []);
+        const ordersArray = data.data?.orders || data.orders || [];
+        // Transform the data to match the expected structure
+        const transformedOrders = ordersArray.map((order: any) => ({
+          _id: order._id,
+          orderNumber: order._id.slice(-6).toUpperCase(),
+          customer: {
+            name: order.user?.name || 'Unknown Customer',
+            email: order.user?.email || 'No email'
+          },
+          products: order.items || [],
+          total: order.totalAmount || 0,
+          status: order.status || 'pending',
+          createdAt: order.createdAt
+        }));
+        setOrders(transformedOrders);
       } catch (error) {
         console.error('Error fetching orders:', error);
         setError('Failed to load orders');
@@ -43,6 +58,53 @@ export default function Orders() {
 
     fetchOrders();
   }, []);
+
+  const cancelOrder = async (orderId: string, order: Order) => {
+    if (!confirm('Are you sure you want to cancel this order?')) return;
+    
+    setUpdatingStatus(orderId);
+    try {
+      await adminAPI.cancelOrder(orderId, {
+        customer: order.customer,
+        orderNumber: order.orderNumber,
+        totalAmount: order.total
+      });
+      
+      // Update local state
+      setOrders(prevOrders => 
+        prevOrders.map(o => 
+          o._id === orderId ? { ...o, status: 'cancelled' } : o
+        )
+      );
+    } catch (error) {
+      console.error('Failed to cancel order:', error);
+      setError('Failed to cancel order');
+    } finally {
+      setUpdatingStatus(null);
+    }
+  };
+
+  const updateOrderStatus = async (orderId: string, newStatus: string, order: Order) => {
+    setUpdatingStatus(orderId);
+    try {
+      await adminAPI.updateOrderStatus(orderId, newStatus, {
+        customer: order.customer,
+        orderNumber: order.orderNumber
+      });
+      
+      // Update local state
+      setOrders(prevOrders => 
+        prevOrders.map(o => 
+          o._id === orderId ? { ...o, status: newStatus } : o
+        )
+      );
+    } catch (error) {
+      console.error('Failed to update order status:', error);
+      setError('Failed to update order status');
+    } finally {
+      setUpdatingStatus(null);
+    }
+  };
 
   const filteredOrders = orders.filter(order => {
     const matchesSearch = order.orderNumber.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -179,21 +241,38 @@ export default function Orders() {
                         ${order.total.toFixed(2)}
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap">
-                        <span className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${
-                          order.status === 'delivered' ? 'bg-green-100 text-green-800' :
-                          order.status === 'shipped' ? 'bg-blue-100 text-blue-800' :
-                          order.status === 'processing' ? 'bg-yellow-100 text-yellow-800' :
-                          order.status === 'pending' ? 'bg-orange-100 text-orange-800' :
-                          'bg-red-100 text-red-800'
-                        }`}>
-                          {order.status.charAt(0).toUpperCase() + order.status.slice(1)}
-                        </span>
+                        <select
+                          value={order.status}
+                          onChange={(e) => updateOrderStatus(order._id, e.target.value, order)}
+                          disabled={updatingStatus === order._id}
+                          className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full border-0 ${
+                            order.status === 'delivered' ? 'bg-green-100 text-green-800' :
+                            order.status === 'shipped' ? 'bg-blue-100 text-blue-800' :
+                            order.status === 'processing' ? 'bg-yellow-100 text-yellow-800' :
+                            order.status === 'pending' ? 'bg-orange-100 text-orange-800' :
+                            'bg-red-100 text-red-800'
+                          } ${updatingStatus === order._id ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer'}`}
+                        >
+                          <option value="pending">Pending</option>
+                          <option value="processing">Processing</option>
+                          <option value="shipped">Shipped</option>
+                          <option value="delivered">Delivered</option>
+                          <option value="cancelled">Cancelled</option>
+                        </select>
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
                         {new Date(order.createdAt).toLocaleDateString()}
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
-                        <button className="text-purple-600 hover:text-purple-900 mr-3">
+                        <button 
+                          onClick={() => cancelOrder(order._id, order)}
+                          disabled={updatingStatus === order._id || order.status === 'cancelled'}
+                          className="text-red-600 hover:text-red-900 mr-3 disabled:opacity-50"
+                          title="Cancel Order"
+                        >
+                          Cancel
+                        </button>
+                        <button className="text-purple-600 hover:text-purple-900">
                           <FaEye />
                         </button>
                       </td>

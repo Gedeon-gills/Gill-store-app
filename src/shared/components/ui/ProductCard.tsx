@@ -1,4 +1,4 @@
-import { FaHeart, FaRegHeart, FaEye, FaShoppingCart } from "react-icons/fa";
+import { FaHeart, FaRegHeart, FaEye, FaShoppingCart, FaRandom } from "react-icons/fa";
 import { Link } from "react-router-dom";
 import { useWishlist } from "../layouts/wishlistcontext";
 import { useCart } from "../layouts/cartcontext";
@@ -8,6 +8,10 @@ export default function ProductHomeCard(props: Product) {
   const { addToWishlist, removeFromWishlist, isInWishlist } = useWishlist();
   const { addToCart } = useCart();
   const inWishlist = isInWishlist(props.id);
+  
+  // Check if user is admin
+  const user = localStorage.getItem('user');
+  const isAdmin = user ? JSON.parse(user)?.role === 'admin' : false;
 
   const handleWishlistClick = (e: React.MouseEvent) => {
     e.preventDefault();
@@ -23,6 +27,12 @@ export default function ProductHomeCard(props: Product) {
     addToCart(props);
   };
 
+  const handleProductClick = (e: React.MouseEvent) => {
+    if (isAdmin) {
+      e.preventDefault();
+    }
+  };
+
   const discountPercentage = props.oldPrice
     ? Math.round(((props.oldPrice - props.price) / props.oldPrice) * 100)
     : 0;
@@ -36,9 +46,16 @@ export default function ProductHomeCard(props: Product) {
             {discountPercentage}% OFF
           </span>
         )}
-        <span className="bg-orange-500 px-2 py-1 text-[8px] sm:text-[10px] font-bold uppercase text-white rounded">
-          Featured
+        <span className={`px-2 py-1 text-[8px] sm:text-[10px] font-bold uppercase text-white rounded ${
+          props.availability === "In Stock" ? "bg-green-500" : "bg-red-500"
+        }`}>
+          {props.availability}
         </span>
+        {props.owner && (
+          <span className="bg-blue-500 px-2 py-1 text-[8px] sm:text-[10px] font-medium text-white rounded">
+            {props.owner}
+          </span>
+        )}
       </div>
       
       {/* Wishlist Button */}
@@ -56,35 +73,55 @@ export default function ProductHomeCard(props: Product) {
       
       {/* Product Image */}
       <div className="relative overflow-hidden">
-        {props.images && (
+        {props.images && props.images.length > 0 ? (
           <img
-            src={props.images[0]}
+            src={props.images[0].startsWith('http') ? props.images[0] : `${import.meta.env.VITE_API_URL || 'http://localhost:5000'}${props.images[0]}`}
             alt={props.name}
             className="h-40 sm:h-48 lg:h-56 w-full object-cover transition-transform duration-500 group-hover:scale-110"
+            onError={(e) => {
+              e.currentTarget.src = '/placeholder-image.jpg';
+            }}
           />
+        ) : (
+          <div className="h-40 sm:h-48 lg:h-56 w-full bg-gray-200 flex items-center justify-center">
+            <span className="text-gray-400">No Image</span>
+          </div>
         )}
         
         {/* Hover Actions */}
-        <div className="absolute bottom-0 left-0 w-full bg-blue-600/90 flex justify-center gap-4 p-3 transform translate-y-full transition-transform duration-300 group-hover:translate-y-0">
+        <div className="absolute bottom-0 left-0 w-full flex justify-center gap-4 p-3 transform translate-y-full transition-transform duration-300 group-hover:translate-y-0">
           <button
             onClick={handleAddToCart}
-            className="bg-white text-blue-600 p-2 rounded-full hover:bg-gray-100 transition-colors"
+            className="bg-white/90 text-gray-800 p-2 rounded-full hover:bg-white transition-colors shadow-md"
             title="Add to Cart"
           >
             <FaShoppingCart size={16} />
           </button>
           <Link
-            to={`/product/${props.id}`}
-            className="bg-white text-blue-600 p-2 rounded-full hover:bg-gray-100 transition-colors"
-            title="Quick View"
+            to={isAdmin ? '#' : `/product/${props.id}`}
+            onClick={handleProductClick}
+            className={`bg-white/90 text-gray-800 p-2 rounded-full hover:bg-white transition-colors shadow-md ${
+              isAdmin ? 'cursor-not-allowed opacity-50' : ''
+            }`}
+            title={isAdmin ? 'Admin cannot view product details' : 'Quick View'}
           >
             <FaEye size={16} />
           </Link>
+          <button
+            className="bg-white/90 text-gray-800 p-2 rounded-full hover:bg-white transition-colors shadow-md"
+            title="Shuffle"
+          >
+            <FaRandom size={16} />
+          </button>
         </div>
       </div>
       
       {/* Product Info */}
-      <Link to={`/product/${props.id}`} className="block p-3">
+      <Link 
+        to={isAdmin ? '#' : `/product/${props.id}`} 
+        onClick={handleProductClick}
+        className={`block p-3 ${isAdmin ? 'cursor-not-allowed' : ''}`}
+      >
         <h3 className="mb-2 text-sm font-medium text-gray-800 line-clamp-2 leading-tight">
           {props.name}
         </h3>
@@ -96,11 +133,23 @@ export default function ProductHomeCard(props: Product) {
             </span>
           )}
         </div>
-        <div>
-          <span className="text-xs text-green-600 font-medium">
+        <div className="flex items-center justify-between">
+          <span className={`text-xs font-medium ${
+            props.availability === "In Stock" ? "text-green-600" : "text-red-600"
+          }`}>
             {props.availability}
           </span>
+          {props.sku && (
+            <span className="text-xs text-gray-400">
+              SKU: {props.sku.slice(-6)}
+            </span>
+          )}
         </div>
+        {props.description && (
+          <p className="text-xs text-gray-500 mt-1 line-clamp-2">
+            {props.description}
+          </p>
+        )}
       </Link>
     </div>
   );

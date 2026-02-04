@@ -24,14 +24,14 @@ export default function UserAvatar({ user, size = 'md', showUsername = false }: 
       {user?.profile ? (
         <img 
           src={user.profile} 
-          alt={user.username || 'User'}
+          alt={user.name || user.username || 'User'}
           className={`${sizeClasses[size]} rounded-full object-cover`}
         />
       ) : (
         <FaUser className={iconSizes[size]} />
       )}
-      {showUsername && user?.username && (
-        <span className="hidden sm:inline">{user.username}</span>
+      {showUsername && (user?.name || user?.username) && (
+        <span className="hidden sm:inline">{user.name || user.username}</span>
       )}
     </div>
   );

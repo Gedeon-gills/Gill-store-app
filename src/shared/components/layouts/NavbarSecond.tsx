@@ -1,7 +1,7 @@
-import { FaSearch, FaShoppingBag, FaUser, FaHeart, FaBlog } from "react-icons/fa";
+import { FaSearch, FaShoppingBag, FaUser, FaHeart, FaBlog, FaChevronDown } from "react-icons/fa";
 import { Link, useNavigate } from "react-router-dom";
 import CartDrawer from "../ui/cartsPopup";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import LoginModal from "../ui/login";
 import RegisterModal from "../ui/register";
 import PageLoader from "../ui/PageLoader";
@@ -33,6 +33,8 @@ export default function SecondNavBar() {
   const [isRegisterOpen, setIsRegisterOpen] = useState(false);
   const [user, setUser] = useState<User | null>(getInitialUser);
   const [loading, setLoading] = useState(false);
+  const [showUserMenu, setShowUserMenu] = useState(false);
+  const userMenuRef = useRef<HTMLDivElement>(null);
   
   const openLogin = () => setIsLoginOpen(true);
   const closeRegister = () => setIsRegisterOpen(false);
@@ -54,19 +56,81 @@ export default function SecondNavBar() {
       }
     };
 
+    const handleClickOutside = (event: MouseEvent) => {
+      if (userMenuRef.current && !userMenuRef.current.contains(event.target as Node)) {
+        setShowUserMenu(false);
+      }
+    };
+
     window.addEventListener('userUpdated', handleUserUpdate);
-    return () => window.removeEventListener('userUpdated', handleUserUpdate);
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => {
+      window.removeEventListener('userUpdated', handleUserUpdate);
+      document.removeEventListener('mousedown', handleClickOutside);
+    };
   }, []);
 
-  const handleLoginSuccess = () => {
+  const handleLoginSuccess = async () => {
     const storedUser = localStorage.getItem('user');
     if (storedUser && storedUser !== 'undefined') {
       try {
-        setUser(JSON.parse(storedUser));
+        const userData = JSON.parse(storedUser);
+        
+        // Try to fetch updated profile from backend to get latest photo
+        try {
+          const token = localStorage.getItem('token') || localStorage.getItem('authToken');
+          if (token && token.startsWith('eyJ')) {
+            const response = await fetch(`${import.meta.env.VITE_API_URL || 'http://localhost:5000/api/v1'}/auth/me`, {
+              headers: {
+                'Authorization': `Bearer ${token}`,
+                'Content-Type': 'application/json'
+              }
+            });
+            if (response.ok) {
+              const profileData = await response.json();
+              const updatedUser = { ...userData, profile: profileData.data.user.photo };
+              localStorage.setItem('user', JSON.stringify(updatedUser));
+              setUser(updatedUser);
+              return;
+            }
+          }
+        } catch (error) {
+          console.log('Could not fetch profile, using stored data');
+        }
+        
+        setUser(userData);
       } catch (error) {
         console.error('Error parsing user data:', error);
         localStorage.removeItem('user');
       }
+    }
+  };
+
+  const handleLogout = () => {
+    if (confirm('Are you sure you want to logout?')) {
+      localStorage.removeItem('user');
+      localStorage.removeItem('token');
+      setUser(null);
+      setShowUserMenu(false);
+      navigate('/');
+    }
+  };
+
+  const getDashboardRoute = (role: string) => {
+    switch (role) {
+      case 'admin': return '/admin';
+      case 'vendor': return '/vendor/dashboard';
+      case 'customer': return '/orders';
+      default: return '/orders';
+    }
+  };
+
+  const getDashboardLabel = (role: string) => {
+    switch (role) {
+      case 'admin': return 'Admin Dashboard';
+      case 'vendor': return 'Vendor Dashboard';
+      case 'customer': return 'Order Management';
+      default: return 'Order Management';
     }
   };
   return (
@@ -121,20 +185,52 @@ export default function SecondNavBar() {
           
           <li
             className="relative text-white text-xs sm:text-sm font-medium cursor-pointer p-2 sm:p-1 rounded-lg sm:rounded-none hover:bg-blue-700 sm:hover:bg-transparent transition-colors"
+            ref={userMenuRef}
           >
             {/* Account button */}
             {user ? (
-              <div 
-                onClick={() => {
-                  setLoading(true);
-                  setTimeout(() => {
-                    navigate('/profile');
-                    setLoading(false);
-                  }, 500);
-                }}
-                className="flex items-center gap-2 hover:opacity-80"
-              >
-                <UserAvatar user={user} size="md" showUsername={true} />
+              <div>
+                <div 
+                  onClick={() => setShowUserMenu(!showUserMenu)}
+                  className="flex items-center gap-2 hover:opacity-80"
+                >
+                  <UserAvatar user={user} size="md" showUsername={true} />
+                  <FaChevronDown className="text-xs" />
+                </div>
+                
+                {/* User Menu Dropdown */}
+                {showUserMenu && (
+                  <div className="absolute right-0 top-full mt-2 w-48 bg-white border border-gray-200 rounded-lg shadow-lg z-50">
+                    <div className="py-2">
+                      <button
+                        onClick={() => {
+                          setShowUserMenu(false);
+                          navigate('/profile');
+                        }}
+                        className="w-full text-left px-4 py-2 text-gray-700 hover:bg-gray-100 flex items-center gap-2"
+                      >
+                        <FaUser className="text-sm" />
+                        My Account
+                      </button>
+                      <button
+                        onClick={() => {
+                          setShowUserMenu(false);
+                          navigate(getDashboardRoute(user.role));
+                        }}
+                        className="w-full text-left px-4 py-2 text-gray-700 hover:bg-gray-100"
+                      >
+                        {getDashboardLabel(user.role)}
+                      </button>
+                      <hr className="my-1" />
+                      <button
+                        onClick={handleLogout}
+                        className="w-full text-left px-4 py-2 text-red-600 hover:bg-red-50"
+                      >
+                        Logout
+                      </button>
+                    </div>
+                  </div>
+                )}
               </div>
             ) : (
               <div 

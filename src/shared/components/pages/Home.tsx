@@ -20,9 +20,6 @@ export default function Home() {
         <FirstDivision />
         <Categories />
 
-        {/* DASHBOARD SECTION - Only visible for admin users */}
-        <HomeDashboard />
-
         {/* FEATURED PRODUCTS */}
         <DivStarter description="FEATURED PRODUCTS" />
         <Products random limit={3} />

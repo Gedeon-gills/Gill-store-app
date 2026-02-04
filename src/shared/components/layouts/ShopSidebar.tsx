@@ -1,11 +1,14 @@
-import { useState } from "react";
+import { Link } from "react-router-dom";
+import { useState, useEffect } from "react";
 import { FaChevronDown } from "react-icons/fa";
+import { adminAPI } from "../../services/adminAPI";
 
-const filters = [
-  {
-    title: "Product Categories",
-    items: ["T-Shirts", "Hoodies", "Jeans", "Shoes"],
-  },
+interface Category {
+  _id: string;
+  name: string;
+}
+
+const staticFilters = [
   {
     title: "Filter by Price",
     items: ["$0 - $50", "$50 - $100", "$100 - $200"],
@@ -20,14 +23,35 @@ const filters = [
 
 export default function ShopSidebar() {
   const [openIndex, setOpenIndex] = useState(null);
+  const [categories, setCategories] = useState<Category[]>([]);
+
+  useEffect(() => {
+    const fetchCategories = async () => {
+      try {
+        const response = await adminAPI.getCategories();
+        const categoryData = response.data?.categories || response.categories || [];
+        setCategories(categoryData);
+      } catch (error) {
+        console.error('Failed to fetch categories:', error);
+      }
+    };
+    fetchCategories();
+  }, []);
 
   const toggle = (index: any) => {
     setOpenIndex(openIndex === index ? null : index);
   };
 
+  const categoryFilter = {
+    title: "Product Categories",
+    items: [{ _id: 'all', name: 'All Products' }, ...categories]
+  };
+
+  const allFilters = [categoryFilter, ...staticFilters];
+
   return (
     <div className="w-full lg:w-full lg:max-w-xs lg:ml-40 mt-4 lg:mt-20 p-4 space-y-3 lg:space-y-4">
-      {filters.map((filter, index) => (
+      {allFilters.map((filter, index) => (
         <div key={index}>
           <button
             className="w-full flex justify-between items-center py-2 border-b focus:outline-none"
@@ -47,11 +71,26 @@ export default function ShopSidebar() {
             }`}
           >
             <ul className="flex flex-col gap-1.5 lg:gap-2 text-xs lg:text-sm">
-              {filter.items.map((item, idx) => (
-                <li key={idx} className="cursor-pointer hover:text-blue-500 transition-colors">
-                  {item}
-                </li>
-              ))}
+              {filter.title === "Product Categories" ? (
+                filter.items.map((item: any, idx: number) => (
+                  <li key={idx}>
+                    <Link 
+                      to={item._id === 'all' ? "/shop" : `/shop/${item.name.toLowerCase()}`}
+                      className="cursor-pointer hover:text-blue-500 transition-colors block"
+                    >
+                      {item.name}
+                    </Link>
+                  </li>
+                ))
+              ) : (
+                filter.items.map((item: string, idx: number) => (
+                  <li key={idx}>
+                    <span className="cursor-pointer hover:text-blue-500 transition-colors">
+                      {item}
+                    </span>
+                  </li>
+                ))
+              )}
             </ul>
           </div>
 

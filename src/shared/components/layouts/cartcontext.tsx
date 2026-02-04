@@ -1,8 +1,5 @@
 /* eslint-disable react-refresh/only-export-components */
 import React, { createContext, useContext, useState, useEffect } from "react";
-import { useMutation, useQueryClient } from "@tanstack/react-query";
-import  cartService  from "../../services/cart";
-import  orderService  from "../../services/order";
 import type { Product } from "../../store/products";
 
 interface CartItem extends Product {
@@ -24,27 +21,17 @@ export const CartProvider: React.FC<{ children: React.ReactNode }> = ({
 }) => {
   const [cart, setCart] = useState<CartItem[]>([]);
   const [cartName, setCartName] = useState<string>("");
-  const queryClient = useQueryClient();
 
-  // Load cart from backend on mount
+  // Load cart from localStorage on mount
   useEffect(() => {
-    const loadCart = async () => {
-      if (cartName) {
-        try {
-          const cartData = await orderService.getCartItems(cartName);
-          if (cartData && cartData.items) {
-            setCart(cartData.items);
-          }
-        } catch (error) {
-          console.error("Failed to load cart:", error);
-          // Load from localStorage as fallback
-          const localCart = localStorage.getItem(cartName);
-          if (localCart) {
-            try {
-              setCart(JSON.parse(localCart));
-            } catch (e) {
-              console.error("Failed to parse local cart:", e);
-            }
+    const loadCart = () => {
+      if (cartName && cartName !== '_cart') {
+        const localCart = localStorage.getItem(cartName);
+        if (localCart) {
+          try {
+            setCart(JSON.parse(localCart));
+          } catch (e) {
+            console.error("Failed to parse local cart:", e);
           }
         }
       }
@@ -67,7 +54,8 @@ export const CartProvider: React.FC<{ children: React.ReactNode }> = ({
       if (user && user !== "undefined") {
         try {
           const userData = JSON.parse(user);
-          setCartName(`${userData.username}_cart`);
+          const userName = userData.name || userData.username || userData.email?.split('@')[0] || 'user';
+          setCartName(`${userName}_cart`);
         } catch (error) {
           console.error("Error parsing user data:", error);
         }
@@ -92,22 +80,6 @@ export const CartProvider: React.FC<{ children: React.ReactNode }> = ({
     };
   }, []);
 
-  // Add to cart mutation
-  const addToCartMutation = useMutation({
-    mutationFn: cartService.addToCart,
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["cart"] });
-    },
-  });
-
-  // Remove from cart mutation
-  const removeFromCartMutation = useMutation({
-    mutationFn: cartService.removeFromCart,
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["cart"] });
-    },
-  });
-
   const addToCart = (product: Product) => {
     const currentUser = localStorage.getItem("user");
     if (!currentUser || currentUser === "undefined") {
@@ -119,7 +91,8 @@ export const CartProvider: React.FC<{ children: React.ReactNode }> = ({
     if (!currentCartName) {
       try {
         const userData = JSON.parse(currentUser);
-        currentCartName = `${userData.username}_cart`;
+        const userName = userData.name || userData.username || userData.email?.split('@')[0] || 'user';
+        currentCartName = `${userName}_cart`;
         setCartName(currentCartName);
       } catch (error) {
         console.error("Error parsing user data for cart:", error);
@@ -143,12 +116,6 @@ export const CartProvider: React.FC<{ children: React.ReactNode }> = ({
 
     setCart(newCart);
     localStorage.setItem(currentCartName, JSON.stringify(newCart));
-
-    // Sync with backend
-    addToCartMutation.mutate({
-      productId: product.id,
-      quantity: 1,
-    });
   };
 
   const increaseQty = (id: string) => {
@@ -159,11 +126,6 @@ export const CartProvider: React.FC<{ children: React.ReactNode }> = ({
       );
       setCart(newCart);
       localStorage.setItem(cartName, JSON.stringify(newCart));
-
-      addToCartMutation.mutate({
-        productId: item.id,
-        quantity: 1,
-      });
     }
   };
 
@@ -175,10 +137,6 @@ export const CartProvider: React.FC<{ children: React.ReactNode }> = ({
         const newCart = cart.filter((item) => item.id !== id);
         setCart(newCart);
         localStorage.setItem(cartName, JSON.stringify(newCart));
-        removeFromCartMutation.mutate({
-          CartName: cartName,
-          ProductName: item.name,
-        });
       } else {
         // Decrease quantity
         const newCart = cart.map((item) =>
@@ -197,8 +155,7 @@ export const CartProvider: React.FC<{ children: React.ReactNode }> = ({
         addToCart,
         increaseQty,
         decreaseQty,
-        isLoading:
-          addToCartMutation.isPending || removeFromCartMutation.isPending,
+        isLoading: false,
       }}
     >
       {children}

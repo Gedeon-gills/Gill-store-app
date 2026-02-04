@@ -1,16 +1,21 @@
 import { useState, useEffect, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import { FaUser, FaEdit } from "react-icons/fa";
-import { useQueryClient, useQuery, useMutation } from "@tanstack/react-query";
-import { userService } from "../../services/userService";
+import { adminAPI } from "../../services/adminAPI";
 import Header from "../forms/Headers";
 import Footer from "../forms/Footer";
 
 interface User {
-  username: string;
+  _id?: string;
+  name: string;
+  username?: string;
   email: string;
+  phone?: string;
   profile?: string;
-  UserType: string;
+  role: string;
+  UserType?: string;
+  isActive?: boolean;
+  createdAt?: string;
 }
 
 export default function Profile() {
@@ -18,10 +23,117 @@ export default function Profile() {
   const [uploading, setUploading] = useState(false);
   const [showPasswordModal, setShowPasswordModal] = useState(false);
   const [showDeleteModal, setShowDeleteModal] = useState(false);
+  const [showEditModal, setShowEditModal] = useState(false);
   const [passwordData, setPasswordData] = useState({ currentPassword: '', newPassword: '' });
+  const [editData, setEditData] = useState({ name: '', email: '', phone: '' });
+  const [loading, setLoading] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const navigate = useNavigate();
-  const queryClient = useQueryClient();
+
+  const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      setUploading(true);
+      
+      try {
+        const formData = new FormData();
+        formData.append('photo', file);
+        
+        const response = await adminAPI.updateUserProfile(formData);
+        console.log('Upload response:', response);
+        
+        // Update with backend photo URL
+        const backendPhotoUrl = response.data?.user?.photo;
+        if (backendPhotoUrl) {
+          const updatedUser = { ...localUser, profile: backendPhotoUrl, photo: backendPhotoUrl };
+          setLocalUser(updatedUser);
+          localStorage.setItem('user', JSON.stringify(updatedUser));
+          window.dispatchEvent(new Event('userUpdated'));
+          alert('Photo updated successfully!');
+        } else {
+          alert('Photo uploaded but URL not received from server');
+        }
+      } catch (error: any) {
+        console.error('Error uploading image:', error);
+        if (error.message.includes('authentication token')) {
+          alert('Please log in again to update your photo');
+        } else {
+          alert('Failed to upload image. Please try again.');
+        }
+      } finally {
+        setUploading(false);
+      }
+    }
+  };
+
+  const handleEditProfile = () => {
+    setEditData({
+      name: displayUser?.name || displayUser?.username || '',
+      email: displayUser?.email || '',
+      phone: displayUser?.phone || ''
+    });
+    setShowEditModal(true);
+  };
+
+  const handleSaveEdit = async () => {
+    setLoading(true);
+    try {
+      const formData = new FormData();
+      formData.append('name', editData.name);
+      
+      await adminAPI.updateUserProfile(formData);
+      const updatedUser = { ...localUser, ...editData };
+      setLocalUser(updatedUser);
+      localStorage.setItem('user', JSON.stringify(updatedUser));
+      window.dispatchEvent(new Event('userUpdated'));
+      setShowEditModal(false);
+      alert('Profile updated successfully!');
+    } catch (error) {
+      console.error('Error updating profile:', error);
+      alert('Failed to update profile');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handlePasswordChange = async () => {
+    if (!passwordData.currentPassword || !passwordData.newPassword) {
+      alert('Please fill in all fields');
+      return;
+    }
+    setLoading(true);
+    try {
+      await adminAPI.changePassword({
+        passwordCurrent: passwordData.currentPassword,
+        password: passwordData.newPassword
+      });
+      setShowPasswordModal(false);
+      setPasswordData({ currentPassword: '', newPassword: '' });
+      alert('Password changed successfully!');
+    } catch (error: any) {
+      console.error('Error changing password:', error);
+      if (error.message.includes('authentication token')) {
+        alert('Please log in again to change your password');
+      } else {
+        alert('Failed to change password. Please check your current password.');
+      }
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleDeleteAccount = async () => {
+    alert('Delete account functionality is not available - backend endpoint not implemented');
+    setShowDeleteModal(false);
+  };
+
+  const handleLogout = () => {
+    if (confirm('Are you sure you want to logout?')) {
+      localStorage.removeItem("token");
+      localStorage.removeItem("user");
+      navigate("/");
+    }
+  };
 
   useEffect(() => {
   const storedUser = localStorage.getItem("user");
@@ -32,10 +144,20 @@ export default function Profile() {
   }
 
   // Defer setState → avoids synchronous effect warning
-  Promise.resolve().then(() => {
+  Promise.resolve().then(async () => {
     try {
       const user = JSON.parse(storedUser);
-      setLocalUser(user); // SAFE
+      setLocalUser(user);
+      
+      // Fetch latest profile from database to get current photo
+      try {
+        const profileResponse = await adminAPI.getUserProfile();
+        const updatedUser = { ...user, profile: profileResponse.data.user.photo, photo: profileResponse.data.user.photo };
+        setLocalUser(updatedUser);
+        localStorage.setItem('user', JSON.stringify(updatedUser));
+      } catch (error) {
+        console.log('Could not fetch latest profile, using stored data');
+      }
     } catch (error) {
       console.error("Error parsing user data:", error);
       localStorage.removeItem("user");
@@ -44,103 +166,16 @@ export default function Profile() {
   });
 }, [navigate]);
 
-  // Fetch fresh user data from backend
-  const { data: user, isLoading, error } = useQuery({
-    queryKey: ['profile'],
-    queryFn: () => userService.getProfile(),
-    enabled: !!localUser,
-    staleTime: 5 * 60 * 1000,
-  });
+  // Use localStorage data directly instead of fetching from backend
+  const displayUser = localUser;
 
-  // Update profile mutation
-  const updateProfileMutation = useMutation({
-    mutationFn: userService.updateProfile,
-    onSuccess: (data) => {
-      const updatedUser = { ...localUser, ...data };
-      setLocalUser(updatedUser);
-      localStorage.setItem('user', JSON.stringify(updatedUser));
-      window.dispatchEvent(new Event('userUpdated'));
-      queryClient.invalidateQueries({ queryKey: ['profile'] });
-      setUploading(false);
-    },
-    onError: () => setUploading(false)
-  });
-
-  const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (file) {
-      setUploading(true);
-      // Convert file to base64 or URL for the API
-      const reader = new FileReader();
-      reader.onloadend = () => {
-        updateProfileMutation.mutate({ photo: reader.result as string });
-      };
-      reader.readAsDataURL(file);
-    }
-  };
-
-  // Change password mutation
-  const changePasswordMutation = useMutation({
-    mutationFn: userService.changePassword,
-    onSuccess: () => {
-      setShowPasswordModal(false);
-      setPasswordData({ currentPassword: '', newPassword: '' });
-      alert('Password changed successfully!');
-    },
-    onError: (error: { response?: { data?: { message?: string } } }) => {
-      alert(error.response?.data?.message || 'Failed to change password');
-    }
-  });
-
-  const handlePasswordChange = () => {
-    if (!passwordData.currentPassword || !passwordData.newPassword) {
-      alert('Please fill in all fields');
-      return;
-    }
-    changePasswordMutation.mutate({
-      passwordCurrent: passwordData.currentPassword,
-      password: passwordData.newPassword
-    });
-  };
-
-  const handleDeleteAccount = () => {
-    // Delete account functionality not implemented
-    alert('Delete account functionality is not available');
-  };
-
-  const handleLogout = () => {
-    localStorage.removeItem("token");
-    localStorage.removeItem("user");
-    queryClient.clear();
-    navigate("/");
-  };
-
-  if (!localUser) {
-    return <div>Loading...</div>;
-  }
-
-  if (isLoading) {
+  if (!displayUser) {
     return (
       <div>
         <Header />
         <div className="min-h-screen bg-gray-50 flex items-center justify-center">
           <div className="text-center">
-            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
-            <p className="text-gray-600">Loading profile...</p>
-          </div>
-        </div>
-        <Footer />
-      </div>
-    );
-  }
-
-  if (error) {
-    return (
-      <div>
-        <Header />
-        <div className="min-h-screen bg-gray-50 flex items-center justify-center">
-          <div className="text-center">
-            <p className="text-red-600 mb-4">Error loading profile</p>
+            <p className="text-gray-600 mb-4">Please log in to view your profile</p>
             <button 
               onClick={() => navigate('/')}
               className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700"
@@ -152,13 +187,6 @@ export default function Profile() {
         <Footer />
       </div>
     );
-  }
-
-  // Use backend data if available, fallback to localStorage
-  const displayUser = user || localUser;
-
-  if (!displayUser) {
-    return <div>Loading...</div>;
   }
 
   return (
@@ -199,7 +227,7 @@ export default function Profile() {
               {/* User Info */}
               <div className="flex-1 text-center sm:text-left">
                 <h1 className="text-2xl sm:text-3xl font-bold text-gray-800 mb-2">
-                  {displayUser.username}
+                  {displayUser.name || displayUser.username}
                 </h1>
                 <p className="text-gray-600 mb-4">{displayUser.email}</p>
                 <div className="flex flex-col sm:flex-row gap-3">
@@ -209,7 +237,14 @@ export default function Profile() {
                     className="bg-blue-600 text-white px-6 py-2 rounded-lg hover:bg-blue-700 transition-colors flex items-center justify-center gap-2 disabled:opacity-50"
                   >
                     <FaEdit size={16} />
-                    {uploading ? 'Uploading...' : 'Edit Profile'}
+                    {uploading ? 'Uploading...' : 'Change Photo'}
+                  </button>
+                  <button 
+                    onClick={handleEditProfile}
+                    className="bg-green-600 text-white px-6 py-2 rounded-lg hover:bg-green-700 transition-colors flex items-center justify-center gap-2"
+                  >
+                    <FaEdit size={16} />
+                    Edit Profile
                   </button>
                 </div>
               </div>
@@ -223,17 +258,35 @@ export default function Profile() {
               <h2 className="text-xl font-semibold text-gray-800 mb-4">Personal Information</h2>
               <div className="space-y-4">
                 <div>
-                  <label className="block text-sm font-medium text-gray-600 mb-1">Username</label>
-                  <p className="text-gray-800 bg-gray-50 p-3 rounded-lg">{displayUser.username}</p>
+                  <label className="block text-sm font-medium text-gray-600 mb-1">Full Name</label>
+                  <p className="text-gray-800 bg-gray-50 p-3 rounded-lg">{displayUser.name || displayUser.username || 'Not provided'}</p>
                 </div>
                 <div>
                   <label className="block text-sm font-medium text-gray-600 mb-1">Email</label>
                   <p className="text-gray-800 bg-gray-50 p-3 rounded-lg">{displayUser.email}</p>
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-gray-600 mb-1">User Type</label>
-                  <p className="text-gray-800 bg-gray-50 p-3 rounded-lg capitalize">{displayUser.UserType}</p>
+                  <label className="block text-sm font-medium text-gray-600 mb-1">Phone</label>
+                  <p className="text-gray-800 bg-gray-50 p-3 rounded-lg">{displayUser.phone || 'Not provided'}</p>
                 </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-600 mb-1">Account Type</label>
+                  <p className="text-gray-800 bg-gray-50 p-3 rounded-lg capitalize">{displayUser.role || displayUser.UserType}</p>
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-600 mb-1">Account Status</label>
+                  <p className={`p-3 rounded-lg capitalize ${displayUser.isActive !== false ? 'bg-green-50 text-green-700' : 'bg-red-50 text-red-700'}`}>
+                    {displayUser.isActive !== false ? 'Active' : 'Inactive'}
+                  </p>
+                </div>
+                {displayUser.createdAt && (
+                  <div>
+                    <label className="block text-sm font-medium text-gray-600 mb-1">Member Since</label>
+                    <p className="text-gray-800 bg-gray-50 p-3 rounded-lg">
+                      {new Date(displayUser.createdAt).toLocaleDateString()}
+                    </p>
+                  </div>
+                )}
               </div>
             </div>
 
@@ -271,6 +324,59 @@ export default function Profile() {
         </div>
       </div>
       
+      {/* Edit Profile Modal */}
+      {showEditModal && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+          <div className="bg-white p-6 rounded-lg w-full max-w-md mx-4">
+            <h3 className="text-lg font-semibold mb-4">Edit Profile</h3>
+            <div className="space-y-4">
+              <div>
+                <label className="block text-sm font-medium text-gray-600 mb-1">Full Name</label>
+                <input
+                  type="text"
+                  value={editData.name}
+                  onChange={(e) => setEditData({...editData, name: e.target.value})}
+                  className="w-full p-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-600 mb-1">Email</label>
+                <input
+                  type="email"
+                  value={editData.email}
+                  onChange={(e) => setEditData({...editData, email: e.target.value})}
+                  className="w-full p-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-600 mb-1">Phone</label>
+                <input
+                  type="tel"
+                  value={editData.phone}
+                  onChange={(e) => setEditData({...editData, phone: e.target.value})}
+                  className="w-full p-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                />
+              </div>
+            </div>
+            <div className="flex gap-3 mt-6">
+              <button
+                onClick={() => setShowEditModal(false)}
+                className="flex-1 px-4 py-2 border rounded-lg hover:bg-gray-50"
+              >
+                Cancel
+              </button>
+              <button
+                onClick={handleSaveEdit}
+                disabled={loading}
+                className="flex-1 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:opacity-50"
+              >
+                {loading ? 'Saving...' : 'Save Changes'}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+      
       {/* Password Change Modal */}
       {showPasswordModal && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
@@ -301,10 +407,10 @@ export default function Profile() {
               </button>
               <button
                 onClick={handlePasswordChange}
-                disabled={changePasswordMutation.isPending}
+                disabled={loading}
                 className="flex-1 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:opacity-50"
               >
-                {changePasswordMutation.isPending ? 'Updating...' : 'Update'}
+                {loading ? 'Updating...' : 'Update'}
               </button>
             </div>
           </div>

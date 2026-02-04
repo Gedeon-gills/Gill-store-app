@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import Sidebar from "../components/Sidebar";
-// import { adminAPI } from "../shared/services/adminAPI";
+import { adminAPI } from "../shared/services/adminAPI";
 import { FaArrowUp, FaArrowDown, FaUsers, FaShoppingCart, FaDollarSign, FaEye } from "react-icons/fa";
 
 interface AnalyticsData {
@@ -46,33 +46,23 @@ export default function Analytics() {
     const fetchAnalytics = async () => {
       try {
         setError(null);
-        // This would be a new endpoint for analytics
-        const response = await fetch(`${import.meta.env.VITE_API_URL || 'http://localhost:3000/api'}/admin/analytics?range=${timeRange}`, {
-          headers: {
-            'Content-Type': 'application/json',
-            ...(localStorage.getItem('token') && { 'Authorization': `Bearer ${localStorage.getItem('token')}` })
-          }
-        });
-        
-        if (!response.ok) throw new Error('Failed to fetch analytics');
-        const analyticsData = await response.json();
-        setData(analyticsData);
-      } catch (error) {
-        console.error('Error fetching analytics:', error);
-        setError('Failed to load analytics data');
-        // Mock data for demo
+        const response = await adminAPI.getAnalytics(timeRange);
+        const analyticsData = response.data;
         setData({
-          revenue: { current: 75000, previous: 68000, change: 10.3 },
-          orders: { current: 1250, previous: 1180, change: 5.9 },
-          customers: { current: 890, previous: 820, change: 8.5 },
+          revenue: analyticsData.revenue,
+          orders: analyticsData.orders,
+          customers: analyticsData.customers,
           pageViews: { current: 15420, previous: 14200, change: 8.6 },
           topProducts: [
             { name: "Wireless Headphones", sales: 145, revenue: 28900 },
             { name: "Smart Watch", sales: 98, revenue: 24500 },
             { name: "Laptop Stand", sales: 87, revenue: 8700 }
           ],
-          salesChart: []
+          salesChart: analyticsData.chartData || []
         });
+      } catch (error) {
+        console.error('Error fetching analytics:', error);
+        setError('Failed to load analytics data');
       } finally {
         setLoading(false);
       }

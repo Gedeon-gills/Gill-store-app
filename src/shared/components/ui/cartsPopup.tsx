@@ -163,7 +163,7 @@ const CartDrawer = ({ isOpen, onClose }: CartDrawerProps) => {
               <div className="space-y-2 sm:space-y-3">
                 <button
                   onClick={handleViewCart}
-                  className="bg-gray-600 hover:bg-gray-700 text-white w-full py-2.5 sm:py-3 rounded-lg font-medium transition-colors text-sm sm:text-base"
+                  className="bg-blue-600 hover:bg-blue-700 text-white w-full py-2.5 sm:py-3 rounded-lg font-medium transition-colors text-sm sm:text-base"
                 >
                   View Cart
                 </button>

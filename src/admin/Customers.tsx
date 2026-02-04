@@ -20,6 +20,7 @@ export default function Customers() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [searchTerm, setSearchTerm] = useState("");
+  const [deleting, setDeleting] = useState<string | null>(null);
   const [stats, setStats] = useState({
     total: 0,
     active: 0,
@@ -31,11 +32,12 @@ export default function Customers() {
       try {
         setError(null);
         const data = await adminAPI.getCustomers();
-        setCustomers(data.customers || data || []);
+        const customersArray = data.data?.customers || data.customers || [];
+        setCustomers(customersArray);
         setStats({
-          total: data.stats?.total || data.length || 0,
-          active: data.stats?.active || data.filter((c: Customer) => c.status === 'active').length || 0,
-          newThisMonth: data.stats?.newThisMonth || 0
+          total: data.data?.stats?.total || data.stats?.total || customersArray.length || 0,
+          active: data.data?.stats?.active || data.stats?.active || customersArray.filter((c: Customer) => c.status === 'active').length || 0,
+          newThisMonth: data.data?.stats?.newThisMonth || data.stats?.newThisMonth || 0
         });
       } catch (error) {
         console.error('Error fetching customers:', error);
@@ -52,6 +54,29 @@ export default function Customers() {
     customer.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
     customer.email.toLowerCase().includes(searchTerm.toLowerCase())
   );
+
+  const handleDeleteCustomer = async (customerId: string, customerName: string) => {
+    if (!confirm(`Are you sure you want to delete customer "${customerName}"? This action cannot be undone.`)) {
+      return;
+    }
+    
+    setDeleting(customerId);
+    try {
+      await adminAPI.deleteCustomer(customerId);
+      setCustomers(prev => prev.filter(customer => customer._id !== customerId));
+      // Update stats
+      setStats(prev => ({
+        ...prev,
+        total: prev.total - 1,
+        active: prev.active - 1
+      }));
+    } catch (error) {
+      console.error('Error deleting customer:', error);
+      alert('Failed to delete customer');
+    } finally {
+      setDeleting(null);
+    }
+  };
 
   if (loading) {
     return (
@@ -160,6 +185,7 @@ export default function Customers() {
                   <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Last Order</th>
                   <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Joined</th>
                   <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-gray-200">
@@ -209,11 +235,20 @@ export default function Customers() {
                           {customer.status?.charAt(0).toUpperCase() + customer.status?.slice(1) || 'Active'}
                         </span>
                       </td>
+                      <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
+                        <button
+                          onClick={() => handleDeleteCustomer(customer._id, customer.name)}
+                          disabled={deleting === customer._id}
+                          className="text-red-600 hover:text-red-900 disabled:opacity-50"
+                        >
+                          {deleting === customer._id ? 'Deleting...' : 'Delete'}
+                        </button>
+                      </td>
                     </tr>
                   ))
                 ) : (
                   <tr>
-                    <td colSpan={7} className="px-6 py-8 text-center text-gray-500">
+                    <td colSpan={8} className="px-6 py-8 text-center text-gray-500">
                       {searchTerm ? "No customers match your search" : "No customers found"}
                     </td>
                   </tr>

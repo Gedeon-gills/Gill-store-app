@@ -1,5 +1,6 @@
 // services/userService.ts
 import api from "./ApiSetter";
+import { emailService } from "./emailService";
 export interface userAuth {
   _id?: string;
   username: string;
@@ -30,6 +31,12 @@ export const userService = {
     UserType?: "admin" | "vendor" | "customer";
   }) => {
     const response = await api.post("/auth/register", userData);
+    
+    // Send welcome email after successful registration
+    if (response.data && response.data.user) {
+      await emailService.sendWelcomeEmail(userData.email, userData.username);
+    }
+    
     return response.data;
   },
 
@@ -45,6 +52,12 @@ export const userService = {
   // forgot password
   forgotPassword: async (email: string) => {
     const response = await api.post("/auth/forgotPassword", { email });
+    
+    // Send password reset email
+    if (response.data && response.data.resetToken) {
+      await emailService.sendPasswordResetEmail(email, 'User', response.data.resetToken);
+    }
+    
     return response.data;
   },
 
@@ -71,6 +84,15 @@ export const userService = {
     password: string;
   }) => {
     const response = await api.patch("/auth/updatePassword", passwords);
+    
+    // Send password changed confirmation email
+    if (response.data && response.data.user) {
+      await emailService.sendPasswordChangedEmail(
+        response.data.user.email, 
+        response.data.user.name || response.data.user.username
+      );
+    }
+    
     return response.data;
   },
 
@@ -90,6 +112,22 @@ export const userService = {
   // DELETE account
   deleteUser: async (id: string) => {
     const response = await api.delete(`/auth/admin/users/${id}`);
+    
+    // Send account deactivation email
+    if (response.data && response.data.user) {
+      await emailService.sendAccountDeactivatedEmail(
+        response.data.user.email,
+        response.data.user.name || response.data.user.username,
+        'Account deleted by administrator'
+      );
+    }
+    
+    return response.data;
+  },
+
+  // DELETE own account (self-delete)
+  deleteMyAccount: async () => {
+    const response = await api.delete("/auth/deleteMe");
     return response.data;
   },
 };
