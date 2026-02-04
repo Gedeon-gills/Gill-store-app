@@ -83,10 +83,10 @@ export default function ShopSidebar() {
                   </li>
                 ))
               ) : (
-                filter.items.map((item: string, idx: number) => (
+                filter.items.map((item: any, idx: number) => (
                   <li key={idx}>
                     <span className="cursor-pointer hover:text-blue-500 transition-colors">
-                      {item}
+                      {typeof item === 'string' ? item : item.name}
                     </span>
                   </li>
                 ))

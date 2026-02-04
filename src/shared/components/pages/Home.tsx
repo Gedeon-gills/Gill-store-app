@@ -8,7 +8,6 @@ import Categories from "../ui/Categories";
 import DivStarter from "../ui/DivStarter";
 import Products from "../ui/products";
 import ContentWrapper from "../ui/contentLapup";
-import { HomeDashboard } from "../ui/HomeDashboard";
 import { Menfashion } from "../ui/mesFashion"
 
 export default function Home() {

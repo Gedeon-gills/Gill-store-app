@@ -15,6 +15,8 @@ interface Product {
   stock: number;
   description?: string;
   createdAt?: string;
+  oldPrice?: number;
+  size?: string;
 }
 
 export default function ProductPage() {

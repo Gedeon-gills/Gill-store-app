@@ -11,6 +11,7 @@ interface User {
   id: string;
   name: string;
   email: string;
+  role: string;
   avatar?: string;
 }
 
@@ -32,7 +33,7 @@ export default function SecondNavBar() {
   const [isLoginOpen, setIsLoginOpen] = useState(false);
   const [isRegisterOpen, setIsRegisterOpen] = useState(false);
   const [user, setUser] = useState<User | null>(getInitialUser);
-  const [loading, setLoading] = useState(false);
+  const [loading] = useState(false);
   const [showUserMenu, setShowUserMenu] = useState(false);
   const userMenuRef = useRef<HTMLDivElement>(null);
   
@@ -185,8 +186,8 @@ export default function SecondNavBar() {
           
           <li
             className="relative text-white text-xs sm:text-sm font-medium cursor-pointer p-2 sm:p-1 rounded-lg sm:rounded-none hover:bg-blue-700 sm:hover:bg-transparent transition-colors"
-            ref={userMenuRef}
           >
+            <div ref={userMenuRef}>
             {/* Account button */}
             {user ? (
               <div>
@@ -241,6 +242,7 @@ export default function SecondNavBar() {
                 <span className="hidden sm:inline">SIGN IN</span>
               </div>
             )}
+            </div>
           </li>
         </div>
       </ul>

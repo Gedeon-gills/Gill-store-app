@@ -52,7 +52,7 @@ const LoginModal: React.FC<LoginModalProps> = ({ isOpen, onClose, onLoginSuccess
       if (isLoginView) {
         const response = await userService.LoginUser(loginData);
         localStorage.setItem('token', response.token);
-        localStorage.setItem('user', JSON.stringify(response.data.user));
+        localStorage.setItem('user', JSON.stringify(response.user));
         onLoginSuccess?.(); // Notify parent component
         onClose();
         navigate('/');

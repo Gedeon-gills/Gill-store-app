@@ -45,8 +45,8 @@ export default function Profile() {
         // Update with backend photo URL
         const backendPhotoUrl = response.data?.user?.photo;
         if (backendPhotoUrl) {
-          const updatedUser = { ...localUser, profile: backendPhotoUrl, photo: backendPhotoUrl };
-          setLocalUser(updatedUser);
+          const updatedUser = { ...localUser, profile: backendPhotoUrl, photo: backendPhotoUrl } as User;
+          setLocalUser(updatedUser as User);
           localStorage.setItem('user', JSON.stringify(updatedUser));
           window.dispatchEvent(new Event('userUpdated'));
           alert('Photo updated successfully!');
@@ -82,8 +82,8 @@ export default function Profile() {
       formData.append('name', editData.name);
       
       await adminAPI.updateUserProfile(formData);
-      const updatedUser = { ...localUser, ...editData };
-      setLocalUser(updatedUser);
+      const updatedUser = { ...localUser, ...editData } as User;
+      setLocalUser(updatedUser as User);
       localStorage.setItem('user', JSON.stringify(updatedUser));
       window.dispatchEvent(new Event('userUpdated'));
       setShowEditModal(false);
